@@ -29,47 +29,51 @@ Sistem e-commerce berbasis WordPress + WooCommerce untuk Toko Dyaa Store yang me
 
 ```
 c:\laragon\www\dyaastore\
-├── docs/                              ← Dokumentasi Skripsi
-│   ├── 01-analisis-kebutuhan.md       ← Bab 3.1.2 (KF/KNF)
-│   ├── 02-perancangan-uml.md          ← Bab 3.1.3 (UML, wireframe)
-│   ├── 03-pengujian-blackbox.md       ← Bab 3.2.4 (Skenario testing)
-│   ├── 04-kuesioner-likert.md         ← Bab 3.2.4 (Evaluasi UX)
-│   └── 05-panduan-implementasi.md     ← Step-by-step install
+├── docs/                              ← Dokumentasi Skripsi (BAB III & IV)
+│   ├── README.md                      ← Indeks + mapping ke BAB IV
+│   ├── 01-analisis-kebutuhan.md       ← BAB III §3.1.2 (36 KF + 7 KNF)
+│   ├── 02-perancangan-uml.md          ← BAB III §3.1.3 (UML lengkap)
+│   ├── 03-pengujian-blackbox.md       ← BAB IV §4.2.1 (77 test case)
+│   ├── 04-kuesioner-likert.md         ← BAB IV §4.2.2 (22 pernyataan)
+│   ├── 05-panduan-implementasi.md     ← BAB IV §4.1.1 (lingkungan + setup)
+│   ├── 06-implementasi-antarmuka.md   ← BAB IV §4.1.2 (15 kode AT per halaman)
+│   └── 07-implementasi-fitur.md       ← BAB IV §4.1.3 (12 kode FT level kode)
 ├── wp-content/
 │   ├── themes/dyaastore-child/        ← Child theme custom
-│   │   ├── style.css                  ← Design system: hero, cards, stats, testimoni
-│   │   ├── functions.php              ← Custom field, WA button, dark mode, shortcodes
+│   │   ├── style.css                  ← Design system: hero, cards, stats, testimoni, auth split-screen, theme toggle
+│   │   ├── functions.php              ← Hooks: sidebar, topbar, bottom nav, footer, custom field Roblox, shortcodes
+│   │   ├── front-page.php             ← Render homepage di URL "/"
+│   │   ├── inc/icons.php              ← Library SVG icons (Lucide-style)
 │   │   ├── readme.txt
-│   │   ├── assets/js/dyaastore.js     ← Dark mode toggle + counter animation
-│   │   └── templates/
-│   │       └── template-homepage.php  ← Homepage siap pakai (mirip site referensi)
-│   │   ├── front-page.php             ← Otomatis dipakai untuk URL "/" (root)
-│   │   └── templates/
-│   │       ├── template-homepage.php  ← Page template "Dyaa Store — Homepage"
-│   │       └── part-home-main.php     ← Markup inti beranda (reusable)
-│   │   ├── front-page.php             ← Otomatis dipakai untuk URL "/" (root)
 │   │   ├── assets/
-│   │   │   ├── img/                   ← Logo, hero, & 4 gambar paket Robux (.png)
-│   │   │   └── js/dyaastore.js        ← Dark mode + countdown + counter animation
-│   │   └── templates/
-│   │       ├── template-homepage.php  ← Page template "Dyaa Store — Homepage"
-│   │       └── part-home-main.php     ← Markup inti beranda (reusable)
+│   │   │   ├── img/                   ← Logo, hero, 4 gambar paket Robux (.png)
+│   │   │   └── js/dyaastore.js        ← Dark mode toggle, counter, countdown, live toast, auth tabs
+│   │   ├── templates/
+│   │   │   ├── template-homepage.php  ← Page template "Dyaa Store — Homepage"
+│   │   │   └── part-home-main.php     ← Markup inti beranda (reusable)
+│   │   └── woocommerce/myaccount/
+│   │       └── form-login.php         ← Override auth split-screen + tab Login/Daftar
 │   ├── mu-plugins/
-│   │   ├── dyaastore-helpers.php      ← Helper otomatis (kolom admin, dashboard)
-│   │   └── dyaastore-seeder.php       ← Auto-create kategori, produk + featured image
-│   └── plugins/                       ← WooCommerce, Elementor (sudah ter-install)
-└── (file inti WordPress lainnya)
+│   │   ├── dyaastore-helpers.php      ← Kolom Username Roblox di order list (legacy + HPOS) + dashboard widget
+│   │   ├── dyaastore-pages.php        ← Auto-create 5 halaman statis
+│   │   └── dyaastore-seeder.php       ← Auto-create 6 kategori + 8 produk Robux + featured image
+│   └── plugins/                       ← WooCommerce, Elementor (di-install via wp-admin)
+└── (file inti WordPress, di-exclude .gitignore)
 ```
 
 ## Mapping Implementasi → Skripsi
 
 | Bab Skripsi | Lokasi di Repo |
-|-------------|----------------|
-| Bab 3.1.2 Analisis Kebutuhan | `docs/01-analisis-kebutuhan.md` |
-| Bab 3.1.3 Perancangan (UML) | `docs/02-perancangan-uml.md` |
-| Bab 3.1.4 Implementasi | Folder `wp-content/themes/dyaastore-child/` + `wp-content/mu-plugins/` |
-| Bab 3.1.5 Pengujian | `docs/03-pengujian-blackbox.md` |
-| Bab 3.1.7 Evaluasi | `docs/04-kuesioner-likert.md` |
+|---|---|
+| BAB III §3.1.2 Analisis Kebutuhan | [`docs/01-analisis-kebutuhan.md`](docs/01-analisis-kebutuhan.md) |
+| BAB III §3.1.3 Perancangan (UML) | [`docs/02-perancangan-uml.md`](docs/02-perancangan-uml.md) |
+| **BAB IV §4.1.1** Implementasi Lingkungan | [`docs/05-panduan-implementasi.md`](docs/05-panduan-implementasi.md) |
+| **BAB IV §4.1.2** Implementasi Antarmuka | [`docs/06-implementasi-antarmuka.md`](docs/06-implementasi-antarmuka.md) |
+| **BAB IV §4.1.3** Implementasi Fitur (Listing Program) | [`docs/07-implementasi-fitur.md`](docs/07-implementasi-fitur.md) |
+| **BAB IV §4.2.1** Pengujian Black Box | [`docs/03-pengujian-blackbox.md`](docs/03-pengujian-blackbox.md) |
+| **BAB IV §4.2.2** Pengujian Skala Likert | [`docs/04-kuesioner-likert.md`](docs/04-kuesioner-likert.md) |
+
+> Lihat [`docs/README.md`](docs/README.md) untuk indeks lengkap dan sistem **traceability** kode (KF / AT / FT / TC).
 
 ## Cara Menjalankan (Quick Start)
 

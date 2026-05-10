@@ -1,93 +1,227 @@
-# Skenario Pengujian Black Box — Dyaa Store
+# BAB IV 4.2.1 — Pengujian Black Box
 
-> Acuan: Skripsi Bab 2.4.3 (Black Box Testing) & Bab 3.2.4 (Metode Pengujian)
-> Diisi setelah implementasi selesai. Setiap baris akan jadi bukti pengujian di **BAB IV** skripsi.
-
-## Format Pengujian
-
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
+> **Acuan Skripsi**: BAB II §2.4.3 (Black Box Testing), BAB III §3.2.4 (Metode Pengujian), BAB IV §4.2.1 (Hasil Pengujian Sistem)
+> **Tujuan**: memverifikasi setiap KF (`docs/01-analisis-kebutuhan.md`) berdasarkan **input → output yang diharapkan**, tanpa melihat struktur internal.
+> **Lingkungan**: Laragon Full + WordPress 6.9.x + child theme `dyaastore-child` aktif. Dokumentasi setup ada di `docs/05-panduan-implementasi.md`.
 
 ---
 
-## A. Pengujian Modul Autentikasi
+## 1. Strategi Pengujian
 
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
-| TC-A01 | Login admin dengan kredensial valid | username: `dyaa_admin`, password: valid | Masuk ke dashboard WP | _diisi_ | _Pass/Fail_ |
-| TC-A02 | Login admin dengan password salah | username: valid, password: salah | Pesan error "Password salah" | _diisi_ | _Pass/Fail_ |
-| TC-A03 | Registrasi customer baru | data lengkap dan valid | Akun terbuat, login otomatis | _diisi_ | _Pass/Fail_ |
-| TC-A04 | Registrasi dengan email duplikat | email yang sudah terdaftar | Pesan error "Email sudah digunakan" | _diisi_ | _Pass/Fail_ |
-| TC-A05 | Logout customer | klik tombol logout | Sesi berakhir, redirect ke beranda | _diisi_ | _Pass/Fail_ |
+| Aspek | Metode |
+|---|---|
+| Teknik | Equivalence Partitioning + Boundary Value Analysis |
+| Scope | Hanya fitur yang **benar-benar diimplementasi** dalam Tugas Akhir (lihat `docs/07-implementasi-fitur.md`) |
+| Aktor uji | Pengunjung, Customer (akun test), Admin (`dyaa_admin`) |
+| Browser uji | Chrome 130 (utama) + Firefox 130 (verifikasi cross-browser) |
+| Viewport uji | Desktop 1920×1080, Tablet 768×1024, Mobile 375×667 |
+| Format hasil | Pass / Fail per Test Case (TC) → ringkasan persentase per kategori |
 
-## B. Pengujian Manajemen Produk (Admin)
+### Kolom Tabel
+| Kolom | Penjelasan |
+|---|---|
+| **TC-XXNN** | ID unik test case (misal TC-A01) |
+| **KF Tracking** | KF yang diverifikasi (lihat `docs/01-analisis-kebutuhan.md`) |
+| **Antarmuka** | Kode AT yang menjadi tempat pengujian (lihat `docs/06-implementasi-antarmuka.md`) |
+| **Skenario** | Apa yang dilakukan oleh penguji |
+| **Input** | Nilai input / aksi spesifik |
+| **Expected Output** | Hasil yang diharapkan sesuai spesifikasi |
+| **Hasil Aktual** | Diisi saat eksekusi (deskriptif) |
+| **Status** | Pass / Fail |
 
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
-| TC-B01 | Tambah produk Robux baru | nama, harga, gambar, deskripsi | Produk muncul di halaman shop | _diisi_ | _Pass/Fail_ |
-| TC-B02 | Edit harga produk | ubah harga produk eksisting | Harga baru tersimpan dan tampil | _diisi_ | _Pass/Fail_ |
-| TC-B03 | Hapus produk | klik delete pada produk | Produk hilang dari katalog | _diisi_ | _Pass/Fail_ |
-| TC-B04 | Tambah produk dengan harga kosong | harga = blank | Form gagal submit, ada validasi | _diisi_ | _Pass/Fail_ |
-| TC-B05 | Set produk sebagai Virtual & Downloadable | centang opsi virtual | Produk tidak butuh shipping | _diisi_ | _Pass/Fail_ |
+---
 
-## C. Pengujian Katalog & Pencarian (Customer)
+## A. Pengujian Akses & Navigasi (KF-01 s/d KF-05)
 
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
-| TC-C01 | Buka halaman shop | klik menu Shop | Tampil grid produk Robux | _diisi_ | _Pass/Fail_ |
-| TC-C02 | Klik detail produk | klik salah satu paket | Halaman detail tampil | _diisi_ | _Pass/Fail_ |
-| TC-C03 | Cari produk via search | keyword: "800" | Produk 800 Robux tampil | _diisi_ | _Pass/Fail_ |
-| TC-C04 | Filter berdasarkan kategori | pilih kategori tertentu | Hanya produk di kategori itu tampil | _diisi_ | _Pass/Fail_ |
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-A01 | KF-01 | AT-01 | Buka halaman Beranda | Akses URL `/` | Tampil hero, flash sale, kategori, paket terlaris, cara pesan, stats, testimoni, FAQ, footer | _isi_ | _ |
+| TC-A02 | KF-02 | AT-10 | Sidebar tampil di desktop | Buka homepage di viewport 1920×1080 | Sidebar muncul fixed di kiri dengan 3 grup (Menu, Navigasi, Pengguna) + WhatsApp CTA | _isi_ | _ |
+| TC-A03 | KF-02 | AT-10 | Sidebar mobile (drawer) | Resize viewport ke 375×667, klik tombol hamburger | Sidebar slide dari kiri + overlay gelap muncul; klik overlay → sidebar tertutup | _isi_ | _ |
+| TC-A04 | KF-03 | AT-11 | Topbar lengkap saat logged-out | Buka homepage tanpa login | Search input + Theme toggle + Cart icon + Tombol Masuk (orange) + Tombol Daftar (ghost) | _isi_ | _ |
+| TC-A05 | KF-03 | AT-11 | Topbar saat logged-in | Login lalu buka homepage | Search + Toggle + Cart icon + Tombol "Akun Saya" (orange, hanya 1 CTA) | _isi_ | _ |
+| TC-A06 | KF-04 | AT-12 | Bottom nav muncul di mobile | Viewport ≤ 767px | 4 ikon: Beranda, Shop, Keranjang (badge), Akun — fixed di bottom | _isi_ | _ |
+| TC-A07 | KF-04 | AT-12 | Bottom nav tidak muncul di desktop | Viewport ≥ 1024px | Bottom nav `display: none` | _isi_ | _ |
+| TC-A08 | KF-05 | AT-14a | Klik theme toggle topbar | Klik pill switch di topbar | Body dapat class `dyaa-light`; toggle thumb pindah ke kiri; toggle sidebar ikut sync | _isi_ | _ |
+| TC-A09 | KF-05 | AT-14a | Klik theme toggle sidebar | Klik pill switch di sidebar (mode terang) | Body kehilangan `dyaa-light`; thumb pindah ke kanan; toggle topbar ikut sync; label sidebar berubah ke "Mode Terang" | _isi_ | _ |
+| TC-A10 | KF-05 | AT-14a | Persistensi tema setelah refresh | Aktifkan mode terang lalu hard refresh | Halaman langsung tampil mode terang **tanpa flash gelap** | _isi_ | _ |
 
-## D. Pengujian Keranjang Belanja
+---
 
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
-| TC-D01 | Tambah ke keranjang | klik "Add to Cart" | Notifikasi sukses, counter bertambah | _diisi_ | _Pass/Fail_ |
-| TC-D02 | Ubah quantity di cart | ubah qty 1 → 3 | Subtotal berubah otomatis | _diisi_ | _Pass/Fail_ |
-| TC-D03 | Hapus item dari cart | klik X pada item | Item hilang, total update | _diisi_ | _Pass/Fail_ |
-| TC-D04 | Keranjang kosong | hapus semua item | Pesan "Cart is empty" tampil | _diisi_ | _Pass/Fail_ |
+## B. Pengujian Halaman Statis (KF-06 s/d KF-10)
 
-## E. Pengujian Checkout & Pembayaran
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-B01 | KF-06 | AT-09 | Buka halaman Tentang | Klik menu "Tentang" di sidebar | URL `/tentang/`, muncul section header + Visi/Misi/alasan memilih | _isi_ | _ |
+| TC-B02 | KF-07 | AT-09 | Buka halaman FAQ | Klik menu "FAQ" di sidebar | URL `/faq/`, muncul 8 pertanyaan accordion `<details>` | _isi_ | _ |
+| TC-B03 | KF-07 | AT-09 | Expand item FAQ | Klik salah satu pertanyaan | Pertanyaan terbuka, jawaban tampil; klik lagi → tertutup | _isi_ | _ |
+| TC-B04 | KF-08 | AT-09 | Buka Syarat & Ketentuan | Klik menu Syarat & Ketentuan | URL `/syarat-ketentuan/`, muncul 6 section legal | _isi_ | _ |
+| TC-B05 | KF-09 | AT-09 | Buka Kebijakan Privasi | Klik menu Kebijakan Privasi | URL `/kebijakan-privasi/`, muncul 5 section privasi | _isi_ | _ |
+| TC-B06 | KF-09 | — | Privacy page terdaftar di WP | Settings → Privacy | Halaman "Kebijakan Privasi" sudah ter-set sebagai Privacy Policy Page | _isi_ | _ |
+| TC-B07 | KF-10 | AT-09 | Buka Dukungan Pelanggan | Klik menu Dukungan | URL `/dukungan/`, muncul jam ops + cara kontak + link FAQ + link cek pesanan | _isi_ | _ |
+| TC-B08 | — | — | Trigger ulang halaman seeder | Sebagai admin akses `/wp-admin/?dyaa_pages=1` | Notice "Manual re-seed pages: 0 halaman baru dibuat (yang sudah ada di-skip)." | _isi_ | _ |
 
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
-| TC-E01 | Checkout dengan field lengkap | data + Username Roblox | Order tercatat status Pending | _diisi_ | _Pass/Fail_ |
-| TC-E02 | Checkout tanpa Username Roblox | username kosong | Validasi error: "Wajib diisi" | _diisi_ | _Pass/Fail_ |
-| TC-E03 | Pilih pembayaran Transfer Bank | metode: Bank Transfer | Tampil instruksi rekening | _diisi_ | _Pass/Fail_ |
-| TC-E04 | Pilih pembayaran E-Wallet | metode: e-wallet | Redirect ke gateway | _diisi_ | _Pass/Fail_ |
-| TC-E05 | Pilih pembayaran Virtual Account | metode: VA | Tampil nomor VA | _diisi_ | _Pass/Fail_ |
+---
 
-## F. Pengujian Manajemen Pesanan (Admin)
+## C. Pengujian Katalog & Produk (KF-11 s/d KF-15)
 
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
-| TC-F01 | Lihat daftar pesanan | buka WooCommerce → Orders | Daftar order tampil | _diisi_ | _Pass/Fail_ |
-| TC-F02 | Lihat detail pesanan | klik order | Detail termasuk Username Roblox tampil | _diisi_ | _Pass/Fail_ |
-| TC-F03 | Ubah status order ke Completed | klik update status | Status berubah, customer ter-notif | _diisi_ | _Pass/Fail_ |
-| TC-F04 | Filter pesanan by status | pilih "Processing" | Hanya order processing tampil | _diisi_ | _Pass/Fail_ |
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-C01 | KF-11 | AT-02 | Buka halaman Shop | Klik menu Shop / Semua Paket | URL `/shop/`, grid 8 produk Robux (4 kolom desktop) | _isi_ | _ |
+| TC-C02 | KF-12 | AT-03 | Buka detail produk | Klik produk "100 Robux" | URL `/product/100-robux/`, tampil image + title + harga + Add to Cart | _isi_ | _ |
+| TC-C03 | KF-12 | AT-03 | Detail produk dengan harga sale | Klik produk yang ada sale (mis. 1700 Robux) | Harga lama coret, harga sale aktif, badge SALE muncul | _isi_ | _ |
+| TC-C04 | KF-13 | AT-01 | Lihat 6 kartu kategori di beranda | Scroll ke section Kategori Produk | 6 kartu: Paket Hemat (PROMO), Voucher (TERLARIS), Gamepass, Premium (BARU), Bundle, Limited (HOT) | _isi_ | _ |
+| TC-C05 | KF-13 | AT-02 | Filter kategori | Klik kartu kategori "Paket Hemat" | URL `/product-category/paket-hemat/`, hanya tampil produk kategori tsb | _isi_ | _ |
+| TC-C06 | KF-14 | AT-01 | Section Flash Sale tampil | Buka beranda | Header ⚡ "Flash Sale Robux" + countdown timer + 3 produk on-sale | _isi_ | _ |
+| TC-C07 | KF-14 | AT-01 | Countdown timer berjalan | Tunggu 5 detik di beranda | Detik di countdown turun real-time (visible pada `[data-cd="seconds"]`) | _isi_ | _ |
+| TC-C08 | KF-15 | AT-11 | Search produk valid | Topbar → ketik "800" → Enter | URL `/?s=800&post_type=product`, tampil "800 Robux" + variannya | _isi_ | _ |
+| TC-C09 | KF-15 | AT-11 | Search produk tidak ada | Ketik "PSN Card" | Tampil pesan "No products were found matching your selection." | _isi_ | _ |
 
-## G. Pengujian Notifikasi
+---
 
-| ID | Skenario | Input | Expected Output | Actual Output | Status |
-|----|----------|-------|-----------------|---------------|--------|
-| TC-G01 | Email konfirmasi order baru ke customer | order baru dibuat | Email diterima | _diisi_ | _Pass/Fail_ |
-| TC-G02 | Email notifikasi ke admin | order baru dibuat | Admin terima email | _diisi_ | _Pass/Fail_ |
-| TC-G03 | Email order completed | status: completed | Customer terima email selesai | _diisi_ | _Pass/Fail_ |
+## D. Pengujian Autentikasi (KF-16 s/d KF-19)
+
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-D01 | KF-16 | AT-07 | Buka halaman My Account (logged-out) | Klik tombol "Masuk" di topbar | URL `/my-account/`, layout split-screen (hero kiri + card kanan), tab "Masuk" aktif | _isi_ | _ |
+| TC-D02 | KF-16 | AT-07 | Buka via tombol Daftar | Klik tombol "Daftar" di topbar | URL `/my-account/?action=register`, tab "Daftar" aktif | _isi_ | _ |
+| TC-D03 | KF-16 | AT-07 | Switch tab tanpa reload | Klik tab "Daftar" di card auth | Pane register aktif, URL berubah ke `?action=register` (tanpa reload halaman) | _isi_ | _ |
+| TC-D04 | KF-17 | AT-07 | Registrasi customer baru | Email valid baru + password 8+ char → Submit | Akun terbuat, login otomatis, redirect ke `/my-account/` (Akun Saya) | _isi_ | _ |
+| TC-D05 | KF-17 | AT-07 | Registrasi dengan email duplikat | Email yang sudah terdaftar | Notice merah: "An account is already registered with your email address." | _isi_ | _ |
+| TC-D06 | KF-18 | AT-07 | Login customer dengan kredensial valid | Email + password yang benar | Redirect ke `/my-account/` (Akun Saya) tampil | _isi_ | _ |
+| TC-D07 | KF-18 | AT-07 | Login dengan password salah | Email valid + password salah | Notice: "ERROR: The password you entered for the email address ... is incorrect." | _isi_ | _ |
+| TC-D08 | KF-18 | AT-08 | Logout customer | Klik link Logout | Sesi berakhir, redirect ke `/my-account/` (form login lagi) | _isi_ | _ |
+| TC-D09 | KF-19 | AT-08 | Tampilan Akun Saya | Login lalu buka `/my-account/` | Menu Woo: Dashboard, Orders, Downloads, Addresses, Account details, Logout | _isi_ | _ |
+
+---
+
+## E. Pengujian Keranjang (KF-20 s/d KF-21)
+
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-E01 | KF-20 | AT-03 | Tambah ke keranjang | Klik "Add to Cart" pada produk | Notice sukses muncul; counter `.dyaa-cart-badge` di topbar bertambah +1 setelah refresh | _isi_ | _ |
+| TC-E02 | KF-20 | AT-04 | Buka keranjang | Klik ikon cart di topbar / bottom nav | URL `/cart/`, tampil tabel item dengan thumbnail + harga + quantity + subtotal | _isi_ | _ |
+| TC-E03 | KF-21 | AT-04 | Ubah quantity | Ubah qty 1 → 3 lalu klik Update Cart | Subtotal otomatis berubah (harga × 3) | _isi_ | _ |
+| TC-E04 | KF-21 | AT-04 | Hapus item | Klik ikon × pada item | Item hilang dari tabel; total dihitung ulang | _isi_ | _ |
+| TC-E05 | KF-21 | AT-04 | Keranjang kosong | Hapus semua item | Pesan "Your cart is currently empty." + tombol "Return to shop" | _isi_ | _ |
+| TC-E06 | KF-20 | AT-12 | Counter cart di bottom nav (mobile) | Tambah produk + buka di viewport mobile | Badge angka muncul di icon Keranjang | _isi_ | _ |
+
+---
+
+## F. Pengujian Checkout & Field Roblox (KF-22 s/d KF-25)
+
+> Section paling penting untuk skripsi karena menguji **fitur custom utama** (FT-01).
+
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-F01 | KF-22 | AT-05 | Buka halaman Checkout | Cart isi → klik Proceed to Checkout | URL `/checkout/`, layout 2 kolom (form kiri, summary kanan) | _isi_ | _ |
+| TC-F02 | KF-22 | AT-05 | Section Roblox tampil | Buka checkout | Section "🎮 Data Akun Roblox" muncul setelah catatan order | _isi_ | _ |
+| TC-F03 | KF-23 | AT-05 | Checkout sukses dengan data lengkap | Billing valid + Username `roblox_player99` + metode bayar | Redirect ke `/checkout/order-received/...`, halaman thank-you tampil | _isi_ | _ |
+| TC-F04 | KF-23 | AT-05 | Validasi: username kosong | Field Username Roblox dikosongkan + submit | Notice merah: "Username Roblox wajib diisi untuk pengiriman Robux." | _isi_ | _ |
+| TC-F05 | KF-23 | AT-05 | Validasi: username terlalu pendek | Username `ab` (2 char) | Notice: "Username Roblox harus 3-20 karakter." | _isi_ | _ |
+| TC-F06 | KF-23 | AT-05 | Validasi: username terlalu panjang | Username 21 char | Notice: "Username Roblox harus 3-20 karakter." | _isi_ | _ |
+| TC-F07 | KF-23 | AT-05 | Validasi: karakter ilegal | Username `roblox-player!` | Notice: "Username Roblox hanya boleh huruf, angka, dan underscore." | _isi_ | _ |
+| TC-F08 | KF-23 | AT-05 | Boundary value: tepat 3 karakter | Username `abc` | Submit sukses, order tercatat | _isi_ | _ |
+| TC-F09 | KF-23 | AT-05 | Boundary value: tepat 20 karakter | Username `abcdefghij1234567890` | Submit sukses, order tercatat | _isi_ | _ |
+| TC-F10 | KF-24 | AT-05 | Pilih Direct Bank Transfer | Pilih Direct bank transfer + submit | Order status: On hold; halaman thank-you tampil instruksi rekening | _isi_ | _ |
+| TC-F11 | KF-25 | AT-06 | Username Roblox tampil di Thank You | Lanjut dari TC-F03 | Halaman thank-you menampilkan baris "Username Roblox: roblox_player99" | _isi_ | _ |
+
+---
+
+## G. Pengujian Manajemen Pesanan oleh Admin (KF-26 s/d KF-31)
+
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-G01 | KF-26 | — | Login admin valid | `dyaa_admin` + password valid | Masuk ke `/wp-admin/`, dashboard tampil | _isi_ | _ |
+| TC-G02 | KF-26 | — | Login admin password salah | password salah | Pesan: "Error: The password you entered for the username ... is incorrect." | _isi_ | _ |
+| TC-G03 | KF-27 | — | Tambah produk Robux baru | Add new product: nama "5000 Robux", harga 800.000, kategori Premium | Produk tersimpan, otomatis ter-set sebagai Virtual product | _isi_ | _ |
+| TC-G04 | KF-27 | — | Edit harga produk | Ubah harga 18.000 → 16.500 | Harga baru tersimpan; tampil di shop | _isi_ | _ |
+| TC-G05 | KF-27 | — | Hapus produk | Klik Trash pada produk | Produk hilang dari shop | _isi_ | _ |
+| TC-G06 | KF-27 | — | Trigger ulang seeder produk | Akses `/wp-admin/?dyaa_seed=1` | Notice "Re-seed selesai (yang sudah ada di-skip)" | _isi_ | _ |
+| TC-G07 | KF-28 | AT-15a | Lihat kolom Username Roblox di order list | WooCommerce → Orders | Kolom **Username Roblox** muncul setelah kolom Status | _isi_ | _ |
+| TC-G08 | KF-28 | AT-15a | Order tanpa username (mis. order legacy) | Buka order yang dibuat sebelum field aktif | Kolom Username Roblox menampilkan tanda `—` | _isi_ | _ |
+| TC-G09 | KF-29 | AT-15b | Detail order: Username Roblox tampil | Klik order yang dibuat di TC-F03 | Di sidebar (di bawah Billing Address) muncul "Username Roblox: roblox_player99" | _isi_ | _ |
+| TC-G10 | KF-30 | — | Ubah status order | Order Pending → ubah ke Processing | Status berubah, tabel order list ter-update | _isi_ | _ |
+| TC-G11 | KF-30 | — | Ubah status order ke Completed | Status → Completed | Status berubah ke Completed; trigger email otomatis ke customer | _isi_ | _ |
+| TC-G12 | KF-31 | AT-15c | Dashboard widget tampil | Buka `/wp-admin/index.php` | Widget "🎮 Dyaa Store — Ringkasan" muncul dengan jumlah produk + order | _isi_ | _ |
+
+---
+
+## H. Pengujian Notifikasi Email (KF-32 s/d KF-34)
+
+> **Catatan**: di lingkungan Laragon lokal, email tidak terkirim secara default. Untuk pengujian gunakan **WP Mail SMTP** + Mailtrap (sandbox) atau cek lewat file log `wp-content/debug.log` setelah aktifkan `WP_DEBUG_LOG`.
+
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-H01 | KF-32 | — | Email konfirmasi ke customer | Order baru dibuat (TC-F03) | Email "Your order is confirmed" diterima customer dengan **Username Roblox** tercantum | _isi_ | _ |
+| TC-H02 | KF-33 | — | Email pemberitahuan ke admin | Order baru dibuat | Email "New order: #XXXX" diterima admin dengan Username Roblox | _isi_ | _ |
+| TC-H03 | KF-34 | — | Email order completed | Admin ubah status ke Completed (TC-G11) | Email "Your order is now complete" diterima customer | _isi_ | _ |
+
+---
+
+## I. Pengujian Antarmuka & Fitur Khas (KF-35, KF-36, KNF-04, KNF-07)
+
+| TC | KF/KNF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-I01 | KF-35 | AT-14b | WhatsApp sticker tampil | Buka homepage (desktop) | Sticker oranye + balon "BUTUH BANTUAN — KLIK DISINI!!" muncul kanan-bawah | _isi_ | _ |
+| TC-I02 | KF-35 | AT-14b | Klik WhatsApp sticker | Klik sticker | Tab baru terbuka ke `https://wa.me/6289515881150?text=...` dengan teks pre-filled | _isi_ | _ |
+| TC-I03 | KF-36 | AT-14c | Live toast tampil | Buka homepage, tunggu 4 detik | Toast tampil di kiri-bawah dengan nama + produk + waktu | _isi_ | _ |
+| TC-I04 | KF-36 | AT-14c | Live toast rotasi | Tunggu 8 detik tambahan | Konten toast berganti ke transaksi berikutnya | _isi_ | _ |
+| TC-I05 | KF-36 | AT-14c | Tutup live toast | Klik tombol × | Toast hilang dan tidak muncul lagi sampai refresh | _isi_ | _ |
+| TC-I06 | KNF-04 | AT-01 | Responsive desktop | Viewport 1920×1080 | Layout 3 kolom (sidebar + main + topbar full); tidak ada horizontal scroll | _isi_ | _ |
+| TC-I07 | KNF-04 | AT-01 | Responsive tablet | Viewport 768×1024 | Sidebar collapse; topbar tetap tampil; grid produk jadi 2–3 kolom | _isi_ | _ |
+| TC-I08 | KNF-04 | AT-01 | Responsive mobile | Viewport 375×667 | Bottom nav muncul; sidebar tersembunyi (hamburger); konten 1 kolom; tidak ada horizontal scroll | _isi_ | _ |
+| TC-I09 | KNF-07 | AT-14a | Pre-paint anti-flash | Set mode terang → close tab → buka kembali | Halaman langsung tampil mode terang, **tanpa flash gelap** sepersekian detik | _isi_ | _ |
 
 ---
 
 ## Ringkasan Hasil Pengujian (Diisi Setelah Eksekusi)
 
 | Kategori | Total TC | Pass | Fail | % Berhasil |
-|----------|----------|------|------|------------|
-| A. Autentikasi | 5 | _ | _ | _ |
-| B. Manajemen Produk | 5 | _ | _ | _ |
-| C. Katalog | 4 | _ | _ | _ |
-| D. Keranjang | 4 | _ | _ | _ |
-| E. Checkout | 5 | _ | _ | _ |
-| F. Manajemen Pesanan | 4 | _ | _ | _ |
-| G. Notifikasi | 3 | _ | _ | _ |
-| **TOTAL** | **30** | _ | _ | _ |
+|---|---|---|---|---|
+| A. Akses & Navigasi | 10 | _ | _ | _ |
+| B. Halaman Statis | 8 | _ | _ | _ |
+| C. Katalog & Produk | 9 | _ | _ | _ |
+| D. Autentikasi | 9 | _ | _ | _ |
+| E. Keranjang | 6 | _ | _ | _ |
+| F. Checkout & Field Roblox | 11 | _ | _ | _ |
+| G. Manajemen Pesanan Admin | 12 | _ | _ | _ |
+| H. Notifikasi Email | 3 | _ | _ | _ |
+| I. Antarmuka & Fitur Khas | 9 | _ | _ | _ |
+| **TOTAL** | **77** | _ | _ | _ |
 
-**Kesimpulan**: _diisi setelah pengujian (mis. "Sistem dinyatakan layak digunakan dengan tingkat keberhasilan X%")_
+### Rumus Persentase
+```
+% Berhasil = (Jumlah TC Pass / Total TC) × 100%
+```
+
+### Kriteria Kelulusan Sistem (sesuai BAB III §3.2.4)
+| % Berhasil | Kategori | Tindakan |
+|---|---|---|
+| ≥ 95% | Sangat Layak | Sistem siap production |
+| 85% – 94% | Layak | Sistem dapat dipakai dengan catatan minor |
+| 70% – 84% | Cukup Layak | Perlu perbaikan pada TC yang gagal |
+| < 70% | Tidak Layak | Sistem belum dapat di-rilis, perbaikan menyeluruh |
+
+### Kesimpulan
+> _Diisi setelah eksekusi_, contoh format:
+>
+> "Berdasarkan hasil pengujian Black Box dengan total 77 *test case* yang dieksekusi pada lingkungan Laragon + WordPress 6.9 + WooCommerce 9.x + child theme `dyaastore-child`, diperoleh tingkat keberhasilan sebesar **___ %** (Pass: ___, Fail: ___). Dengan demikian sistem Dyaa Store dinyatakan **___** sesuai kriteria kelulusan BAB III §3.2.4. Test case yang gagal serta upaya perbaikannya dijelaskan pada Lampiran B."
+
+---
+
+## Lampiran A — Catatan Pelaksanaan Pengujian
+
+| Aspek | Catatan |
+|---|---|
+| Tester | Wahyu Akbar Pratama Siregar (NIM 0110122029) |
+| Tanggal pelaksanaan | _isi_ |
+| Versi sistem yang diuji | child theme `dyaastore-child` v _isi_ |
+| Database snapshot | _isi (export `.sql` jika perlu)_ |
+| Bukti screenshot | Disimpan di `docs/screenshots/` (lihat naming di `06-implementasi-antarmuka.md`) |
+
+## Lampiran B — Test Case yang Gagal (jika ada)
+
+| TC | Skenario | Penyebab | Tindakan Perbaikan | Status Setelah Fix |
+|---|---|---|---|---|
+| _TC-XX0N_ | _isi singkat_ | _isi root cause_ | _isi langkah perbaikan_ | _Pass setelah retest_ |
