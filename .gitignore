@@ -1,0 +1,97 @@
+# =============================================================
+# .gitignore — Dyaa Store
+# Tugas Akhir Wahyu Akbar Pratama Siregar — STT-NF 2026
+#
+# Repo ini fokus pada KARYA CUSTOM (child theme, mu-plugins, dokumentasi
+# skripsi). WordPress core dan plugin pihak ketiga sengaja tidak di-track:
+# 1. Mempercepat clone & build
+# 2. Mencegah konflik saat update WordPress / WooCommerce
+# 3. Menjaga kerahasiaan kredensial database
+# =============================================================
+
+# --- WordPress core (download via wordpress.org) -------------
+/wp-admin/
+/wp-includes/
+/wp-activate.php
+/wp-blog-header.php
+/wp-comments-post.php
+/wp-config.php
+/wp-config-sample.php
+/wp-cron.php
+/wp-links-opml.php
+/wp-load.php
+/wp-login.php
+/wp-mail.php
+/wp-settings.php
+/wp-signup.php
+/wp-trackback.php
+/xmlrpc.php
+/index.php
+/license.txt
+/readme.html
+/.htaccess
+
+# --- Vendor plugins (install via wp-admin) -------------------
+/wp-content/plugins/*
+!/wp-content/plugins/index.php
+
+# --- Uploads & cache (data runtime) --------------------------
+/wp-content/uploads/
+/wp-content/cache/
+/wp-content/upgrade/
+/wp-content/upgrade-temp-backup/
+/wp-content/backup-db/
+/wp-content/backups/
+/wp-content/blogs.dir/
+/wp-content/wflogs/
+/wp-content/index.php
+
+# --- Default themes bawaan WordPress (tidak dipakai) ---------
+/wp-content/themes/twentytwenty*
+/wp-content/themes/twentytwentyone*
+/wp-content/themes/twentytwentytwo*
+/wp-content/themes/twentytwentythree*
+/wp-content/themes/twentytwentyfour*
+/wp-content/themes/twentytwentyfive*
+/wp-content/themes/hello-elementor/
+/wp-content/themes/hello-biz/
+/wp-content/themes/hello-*
+/wp-content/themes/index.php
+
+# --- Secrets / kredensial ------------------------------------
+.env
+.env.local
+.env.*.local
+auth.json
+*.pem
+*.key
+secrets.json
+
+# --- Build artifacts / cache ---------------------------------
+node_modules/
+vendor/
+*.log
+*.bak
+*.swp
+*.swo
+*.tmp
+*.cache
+.phpunit.result.cache
+
+# --- OS / Editor ---------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+.cursor/
+*.code-workspace
+*~
+
+# --- Local debug / dump --------------------------------------
+debug.log
+error_log
+dump.sql
+*.sql
+*.zip
+*.tar.gz
