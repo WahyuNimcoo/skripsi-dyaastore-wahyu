@@ -369,6 +369,10 @@ Pengguna [logged-in]
 | **Daftar** | CTA outline ghost → `/my-account/?action=register` |
 | Saat logged-in | Hanya tampil **Akun Saya** (orange solid) |
 
+### Kompatibilitas tema parent (Hello Elementor)
+
+Tema parent memuat `reset.css` dengan warna aksen `#c36` pada `<button>` default. Child theme menetralkan efek pink tersebut untuk `body.dyaa-site` (lihat bagian paling atas `style.css` dan §5.5 di `05-panduan-implementasi.md`) agar hamburger, theme toggle, dan kontrol lain mengikuti palet Dyaa Store.
+
 ---
 
 ## AT-12 — Bottom Navigation (Mobile Only)
@@ -386,7 +390,7 @@ Pengguna [logged-in]
 └────────────────────────────────────┘
 ```
 
-- Tampil hanya pada viewport mobile (≤ 767px) lewat CSS media query.
+- Tampil pada viewport **≤768px** lewat CSS media query (`display: flex` pada `.dyaa-bottomnav`).
 - Item aktif diberi indikator (warna orange + label tebal).
 - Cart icon punya badge counter.
 

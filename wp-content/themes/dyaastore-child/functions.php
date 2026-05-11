@@ -67,18 +67,26 @@ function dyaastore_enqueue_styles() {
         get_template_directory_uri() . '/style.css'
     );
 
+    // Pakai filemtime() supaya cache otomatis ter-invalidate setiap kali
+    // style.css disimpan ulang (tidak terikat ke header "Version:" di stylesheet).
+    $child_css_path = get_stylesheet_directory() . '/style.css';
+    $child_css_ver  = file_exists( $child_css_path ) ? filemtime( $child_css_path ) : wp_get_theme()->get( 'Version' );
+
     wp_enqueue_style(
         'dyaastore-child',
         get_stylesheet_directory_uri() . '/style.css',
         array( 'hello-elementor-parent', 'dyaastore-google-fonts' ),
-        wp_get_theme()->get( 'Version' )
+        $child_css_ver
     );
+
+    $child_js_path = get_stylesheet_directory() . '/assets/js/dyaastore.js';
+    $child_js_ver  = file_exists( $child_js_path ) ? filemtime( $child_js_path ) : wp_get_theme()->get( 'Version' );
 
     wp_enqueue_script(
         'dyaastore-script',
         get_stylesheet_directory_uri() . '/assets/js/dyaastore.js',
         array(),
-        wp_get_theme()->get( 'Version' ),
+        $child_js_ver,
         true
     );
 }
@@ -543,13 +551,13 @@ function dyaastore_render_whatsapp_button() {
        class="dyaa-wa-sticker"
        target="_blank"
        rel="noopener noreferrer"
-       aria-label="Hubungi WhatsApp Dyaa Store">
-        <span class="dyaa-wa-sticker-balloon">
-            <span class="dyaa-wa-line-1"><?php esc_html_e( 'BUTUH BANTUAN', 'dyaastore-child' ); ?></span>
-            <span class="dyaa-wa-line-2"><?php esc_html_e( 'KLIK DISINI!!', 'dyaastore-child' ); ?></span>
+       aria-label="<?php esc_attr_e( 'Hubungi customer service Dyaa Store via WhatsApp', 'dyaastore-child' ); ?>">
+        <span class="dyaa-wa-sticker-label">
+            <span class="dyaa-wa-sticker-title"><?php esc_html_e( 'Butuh bantuan?', 'dyaastore-child' ); ?></span>
+            <span class="dyaa-wa-sticker-sub"><?php esc_html_e( 'Chat admin via WhatsApp', 'dyaastore-child' ); ?></span>
         </span>
-        <span class="dyaa-wa-sticker-mascot" aria-hidden="true">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+        <span class="dyaa-wa-sticker-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
                 <path fill="#fff" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
             </svg>
         </span>
@@ -863,12 +871,12 @@ function dyaastore_shortcode_hero( $atts ) {
         : home_url( '/' );
 
     $atts = shortcode_atts( array(
-        'badge'      => 'TOP UP CEPAT & TERPERCAYA',
-        'title'      => 'TOP UP <span class="accent">ROBUX</span>',
-        'subtitle'   => 'Nikmati pengalaman pembelian Robux otomatis kapan pun di manapun kamu mau. Proses cepat, harga bersaing, terpercaya.',
-        'cta1_label' => 'Belanja Sekarang',
+        'badge'      => __( 'Top up cepat & terpercaya', 'dyaastore-child' ),
+        'title'      => __( 'Top up <span class="accent">Robux</span> termurah di Indonesia', 'dyaastore-child' ),
+        'subtitle'   => __( 'Pilih paket di katalog, bayar lewat QRIS atau transfer bank, lalu Robux dikirim ke username Roblox kamu setelah pembayaran terverifikasi.', 'dyaastore-child' ),
+        'cta1_label' => __( 'Lihat paket Robux', 'dyaastore-child' ),
         'cta1_url'   => $default_shop,
-        'cta2_label' => 'Hubungi Kami',
+        'cta2_label' => __( 'Chat WhatsApp', 'dyaastore-child' ),
         'cta2_url'   => 'https://wa.me/' . DYAA_WHATSAPP_NUMBER,
     ), $atts, 'dyaa_hero' );
 
@@ -885,7 +893,7 @@ function dyaastore_shortcode_hero( $atts ) {
                 <div class="dyaa-hero-cta">
                     <?php if ( $atts['cta1_label'] ) : ?>
                         <a href="<?php echo esc_url( $atts['cta1_url'] ); ?>" class="dyaa-btn dyaa-btn-primary">
-                            <?php echo esc_html( $atts['cta1_label'] ); ?> →
+                            <?php echo esc_html( $atts['cta1_label'] ); ?>
                         </a>
                     <?php endif; ?>
                     <?php if ( $atts['cta2_label'] ) : ?>

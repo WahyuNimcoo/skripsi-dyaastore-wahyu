@@ -47,9 +47,11 @@ c:\laragon\www\dyaastore\
 │   ├── style.css                            ← Design system Dyaa Store
 │   ├── functions.php                        ← Hooks, shortcode, custom field Roblox
 │   ├── front-page.php                       ← Render homepage di URL "/"
-│   ├── inc/icons.php                        ← Library SVG icons
+│   ├── inc/
+│   │   ├── icons.php                        ← Library SVG icons
+│   │   └── class-wc-dyaa-qris-gateway.php   ← Gateway pembayaran QRIS (WooCommerce)
 │   ├── assets/
-│   │   ├── img/                             ← 6 gambar (hero, logo, robux x4)
+│   │   ├── img/                             ← Aset gambar (hero, logo, robux, QRIS, dll.)
 │   │   └── js/dyaastore.js                  ← JS interaktif (toggle, countdown, toast)
 │   ├── templates/
 │   │   ├── template-homepage.php            ← Page template "Dyaa Store — Homepage"
@@ -108,7 +110,7 @@ c:\laragon\www\dyaastore\
 1. **Appearance → Themes**.
 2. Cari kartu **"Dyaa Store Child"** → klik **Activate**.
 
-> Saat child theme aktif, `functions.php` akan langsung memuat: sidebar custom, topbar, bottom nav, footer global, custom field Roblox di checkout, semua shortcode, dan pre-paint script anti-flash light mode.
+> Saat child theme aktif, `functions.php` akan langsung memuat: sidebar custom, topbar, bottom nav, footer global, custom field Roblox di checkout, semua shortcode, pre-paint script anti-flash light mode, **enqueue `style.css` dan `dyaastore.js` dengan parameter versi `filemtime()`** (perubahan file langsung memaksa browser memuat ulang aset), serta modul QRIS bila file gateway ada di folder `inc/`.
 
 ### STEP 4 — Refresh wp-admin Sekali untuk Trigger Auto-Seeders
 
@@ -221,7 +223,15 @@ ketiga jika ingin payment otomatis tanpa verifikasi manual:
 > batasan BAB I §1.4. QRIS bundled sudah cukup untuk seluruh skenario
 > pembayaran yang diuji di BAB IV §4.2.
 
-### 5.5 Re-trigger Seeders Manual (jika dibutuhkan)
+### 5.5 Kompatibilitas Hello Elementor (`reset.css`)
+
+Tema parent **Hello Elementor** memuat `wp-content/themes/hello-elementor/assets/css/reset.css` yang memberi gaya default ke **semua** elemen `<button>`: border dan teks warna brand `#c36` (pink), serta `background-color: #c36` pada state `:hover` / `:focus`. Tanpa penyesuaian, tombol **hamburger** sidebar (`.dyaa-sidebar-toggle`) dan kontrol lain terlihat seperti “kotak pink”.
+
+Child theme menetralkan konflik ini di **awal** `style.css` dengan selektor `:where(body.dyaa-site) button…` yang memiliki specificity setara rule parent tetapi menang karena urutan cascade (stylesheet child di-enqueue setelah parent). Tombol bermerek (mis. `.dyaa-cta-solid`) tetap memakai gradien orange karena rule class-nya lebih spesifik.
+
+**Breakpoint responsif** sidebar drawer disatukan di blok **“RESPONSIVE FINAL”** di `style.css`, dengan selector `html body .dyaa-sidebar` di dalam `@media (max-width: 1024px)` agar mengalahkan rule sidebar desktop yang memakai specificity tinggi (`html body .dyaa-sidebar`).
+
+### 5.6 Re-trigger Seeders Manual (jika dibutuhkan)
 
 Jika kategori / produk / halaman statis terhapus dan ingin di-buat ulang:
 
@@ -242,7 +252,7 @@ Jika kategori / produk / halaman statis terhapus dan ingin di-buat ulang:
 | Pengaturan                                                    | Nilai                    | Sumber                                                                                  |
 | ------------------------------------------------------------- | ------------------------ | --------------------------------------------------------------------------------------- |
 | Allow customers to create an account on the "My account" page | ✅ Aktif                  | Dipaksa lewat `pre_option_woocommerce_enable_myaccount_registration` di `functions.php` |
-| Allow registration on My Account                              | ✅ Aktif                  | Sda                                                                                     |
+| Allow registration on My Account                              | ✅ Aktif                  | Sama                                                                                     |
 | Username/email register                                       | Email saja (default Woo) | WooCommerce → Settings → Accounts & Privacy                                             |
 
 
@@ -280,7 +290,10 @@ Setelah Step 1–4 selesai, struktur sistem live di lokal seharusnya:
 | Masalah                                        | Solusi                                                                                               |
 | ---------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | Beranda kosong / hanya judul "Sample Page"     | Pastikan child theme `dyaastore-child` aktif di Appearance → Themes                                  |
-| Layout patah / styling hilang                  | Hard refresh browser (`Ctrl+Shift+F5`); pastikan child theme version di `style.css` baru ter-update  |
+| Layout patah / styling hilang                  | Hard refresh (`Ctrl+Shift+R`); di DevTools → Network pastikan `dyaastore-child/style.css?ver=` berisi angka Unix (bukan versi tema statis) |
+| Tombol hamburger / kontrol pink saat hover     | Pastikan child theme terbaru; konflik dari Hello Elementor `reset.css` — lihat §5.5 dokumen ini                                      |
+| Sidebar tetap lebar di tablet / tidak drawer | Pastikan `style.css` memuat blok **RESPONSIVE FINAL**; hard refresh; cek tidak ada CSS tambahan yang override `transform` sidebar       |
+| Bottom nav menutupi konten / WA sticker        | Pastikan `body { padding-bottom }` aktif di breakpoint mobile; sidebar terbuka menyembunyikan bottom nav (perilaku disengaja)          |
 | Halaman statis hilang                          | Buka `/wp-admin/?dyaa_pages=1` (sebagai admin) untuk re-trigger                                      |
 | Produk demo hilang                             | Buka `/wp-admin/?dyaa_seed=1` (sebagai admin) untuk re-trigger                                       |
 | Field Username Roblox tidak muncul di checkout | Pastikan child theme aktif, plugin WooCommerce aktif, lalu refresh halaman checkout                  |

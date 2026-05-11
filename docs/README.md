@@ -16,9 +16,9 @@ Folder `docs/` berisi 7 dokumen yang menjadi **bukti pengembangan** Tugas Akhir:
 | [`02-perancangan-uml.md`](02-perancangan-uml.md) | **BAB III §3.1.3** | Use case, activity, class, sequence, ERD, struktur navigasi, wireframe |
 | [`05-panduan-implementasi.md`](05-panduan-implementasi.md) | **BAB IV §4.1.1** | Implementasi lingkungan + langkah instalasi 4 step |
 | [`06-implementasi-antarmuka.md`](06-implementasi-antarmuka.md) | **BAB IV §4.1.2** | Implementasi antarmuka per halaman (15 kode AT) |
-| [`07-implementasi-fitur.md`](07-implementasi-fitur.md) | **BAB IV §4.1.3** | Implementasi fitur level kode (12 kode FT) + listing program |
-| [`03-pengujian-blackbox.md`](03-pengujian-blackbox.md) | **BAB IV §4.2.1** | 77 *test case* Black Box |
-| [`04-kuesioner-likert.md`](04-kuesioner-likert.md) | **BAB IV §4.2.2** | Kuesioner 22 pernyataan dalam 7 aspek + rumus pengolahan |
+| [`07-implementasi-fitur.md`](07-implementasi-fitur.md) | **BAB IV §4.1.3** | Implementasi fitur level kode (14 kode FT) + listing program |
+| [`03-pengujian-blackbox.md`](03-pengujian-blackbox.md) | **BAB IV §4.2.1** | 100 *test case* Black Box |
+| [`04-kuesioner-likert.md`](04-kuesioner-likert.md) | **BAB IV §4.2.2** | Kuesioner 24 pernyataan dalam 7 aspek + rumus pengolahan |
 
 ---
 
@@ -59,8 +59,8 @@ Saat menulis BAB IV, kamu bisa menyalin / paraphrase dari file-file ini sesuai p
    - Setiap subbab memuat 1 kode FT + cuplikan kode yang sudah ada di file ini.
 
 ### §4.2 Pengujian Sistem
-1. **§4.2.1 Pengujian Black Box** → tabel test case dari `03-pengujian-blackbox.md` (77 TC dalam 9 kategori).
-2. **§4.2.2 Pengujian Skala Likert** → kuesioner & analisis dari `04-kuesioner-likert.md` (22 pernyataan dalam 7 aspek).
+1. **§4.2.1 Pengujian Black Box** → tabel test case dari `03-pengujian-blackbox.md` (100 TC dalam 9 kategori + sub-kategori F2 QRIS).
+2. **§4.2.2 Pengujian Skala Likert** → kuesioner & analisis dari `04-kuesioner-likert.md` (24 pernyataan dalam 7 aspek).
 
 ### §4.3 Hasil & Pembahasan (jika ada)
 - Rangkum *Pass rate* Black Box + persentase Likert per aspek.
@@ -112,8 +112,8 @@ docs/
 |---|---|
 | Semua KF (36) terimplementasi & punya rujukan | ✅ (lihat traceability) |
 | Semua halaman antarmuka punya screenshot | ⏳ ambil saat finalisasi |
-| Black Box: 77 TC sudah dieksekusi & diisi Pass/Fail | ⏳ saat pengujian |
-| Likert: minimal 20 responden mengisi | ⏳ saat sebar kuesioner |
+| Black Box: 100 TC sudah dieksekusi & diisi Pass/Fail | ⏳ saat pengujian |
+| Likert: minimal 20 responden mengisi (24 pernyataan) | ⏳ saat sebar kuesioner |
 | Ringkasan eksekutif untuk slide presentasi | ⏳ |
 | Repository GitHub (kode + docs) sudah final & dapat di-clone | ✅ ([Web-dyaastore](https://github.com/Muzaki29/Web-dyaastore)) |
 

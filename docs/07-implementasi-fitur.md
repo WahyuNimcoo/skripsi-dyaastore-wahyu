@@ -37,6 +37,7 @@
 | FT-11 | Floating WhatsApp Sticker | `functions.php` | KF-35 |
 | FT-12 | Pre-Paint Script Anti-Flash Light Mode | `functions.php` | KF-05, KNF-07 |
 | FT-13 | QRIS Payment Gateway + Auto-Convert Cart/Checkout Klasik | `inc/class-wc-dyaa-qris-gateway.php`, `functions.php` | KF-24 |
+| FT-14 | Neutralisasi `reset.css` Hello Elementor + shell responsif + cache-bust enqueue | `style.css`, `functions.php` | KNF-04, KNF-05, KNF-07 |
 
 ---
 
@@ -815,13 +816,35 @@ ulang.
 
 ---
 
+## FT-14 — Neutralisasi Hello Elementor, Shell Responsif & Cache-Bust Enqueue
+
+**Lokasi**: `wp-content/themes/dyaastore-child/style.css` (blok paling atas **HELLO ELEMENTOR RESET — KILL** + blok **RESPONSIVE FINAL** di akhir file) · `functions.php → dyaastore_enqueue_styles()` (parameter versi `filemtime()` untuk `style.css` dan `dyaastore.js`)
+
+**KF / KNF**: KNF-04 (kompatibilitas & responsif), KNF-05 (kode kustom terkonsentrasi di child theme), KNF-07 (estetika brand tanpa artefak pink default tema parent)
+
+**Antarmuka**: AT-10 (Sidebar), AT-11 (Topbar), AT-12 (Bottom nav)
+
+### Masalah yang diselesaikan
+
+1. **Warna pink `#c36` pada tombol** — file `hello-elementor/assets/css/reset.css` memaksa `button:hover, button:focus` ke background pink. Hamburger (`.dyaa-sidebar-toggle`) dan kontrol lain terlihat “tanda merah/pink”.
+2. **Sidebar tidak off-canvas di ≤1024px** — rule desktop memakai selector `html body .dyaa-sidebar` dengan specificity tinggi; media query lama kalah sehingga layout tidak “mode mobile”.
+3. **Cache stylesheet** — `wp_get_theme()->get( 'Version' )` bisa tidak berubah saat hanya mengedit CSS; browser memuat file lama.
+
+### Solusi ringkas
+
+- Override reset Hello Elementor dengan `:where(body.dyaa-site) button…` agar specificity sama dengan parent tetapi menang lewat urutan cascade; class `.dyaa-*` tetap menang untuk CTA bermerek.
+- Satukan breakpoint di **RESPONSIVE FINAL** dengan `html body .dyaa-sidebar` di dalam `@media (max-width: 1024px)`.
+- `wp_enqueue_style( 'dyaastore-child', …, filemtime( style.css ) )` dan setara untuk JS.
+
+---
+
 ## Daftar Hook WordPress yang Dipakai (Rekap)
 
 Untuk menjelaskan di BAB IV bahwa implementasi mengikuti **best practice WordPress** (semua perilaku custom diintegrasikan lewat hook, bukan modifikasi core), berikut hook yang digunakan:
 
 | Hook | Tipe | Dipakai untuk |
 |---|---|---|
-| `wp_enqueue_scripts` | action | Enqueue style.css child theme + Google Fonts + dyaastore.js |
+| `wp_enqueue_scripts` | action | Enqueue `style.css` + Google Fonts + `dyaastore.js` dengan versi `filemtime()` (FT-14) |
 | `wp_head` (prio 1) | action | Inject pre-paint theme script |
 | `wp_body_open` (prio 4) | action | Render sidebar custom |
 | `wp_body_open` (prio 5) | action | Render bilah navigasi atas |
@@ -858,8 +881,8 @@ Untuk menjelaskan di BAB IV bahwa implementasi mengikuti **best practice WordPre
 
 > Bagian §4.1.3 skripsi dapat menulis ringkas:
 
-> Implementasi fitur custom Dyaa Store dilakukan dengan strategi **modular** dan **non-invasif** terhadap core WordPress. Sebanyak 13 fitur utama (FT-01 hingga FT-13) ditulis menggunakan **hook system** WordPress (action & filter) sehingga ketika WordPress / WooCommerce / Elementor melakukan pembaruan, kode kustom tidak terdampak. Seluruh kode berkonvensi prefix `dyaastore_` (function), `.dyaa-` (CSS class), dan `[dyaa_]` (shortcode) untuk menghindari kolisi dengan plugin pihak ketiga.
+> Implementasi fitur custom Dyaa Store dilakukan dengan strategi **modular** dan **non-invasif** terhadap core WordPress. Sebanyak **14 fitur utama** (FT-01 hingga FT-14) ditulis menggunakan **hook system** WordPress (action & filter) sehingga ketika WordPress / WooCommerce / Elementor melakukan pembaruan, kode kustom tidak terdampak. Seluruh kode berkonvensi prefix `dyaastore_` (function), `.dyaa-` (CSS class), dan `[dyaa_]` (shortcode) untuk menghindari kolisi dengan plugin pihak ketiga.
 
-> Dua *must-use plugin* (`dyaastore-pages.php`, `dyaastore-seeder.php`) memastikan instalasi sistem **dapat direplikasi** karena 5 halaman statis dan 8 produk Robux demo dibuat secara otomatis tanpa intervensi manual. Untuk integrasi WooCommerce versi terbaru, kolom kustom "Username Roblox" pada listing pesanan didaftarkan ganda — pada filter legacy (`manage_edit-shop_order_columns`) dan filter HPOS (`manage_woocommerce_page_wc-orders_columns`) — sehingga sistem berfungsi pada kedua mode storage WooCommerce. Khusus pembayaran QRIS (FT-13), pendekatan **statis dengan verifikasi manual** dipilih sesuai batasan BAB I §1.4 (tanpa integrasi API gateway pihak ketiga) dan disertai konversi halaman Cart/Checkout ke shortcode klasik agar gateway custom tampil pada Block Checkout WooCommerce ≥9.x.
+> Dua *must-use plugin* (`dyaastore-pages.php`, `dyaastore-seeder.php`) memastikan instalasi sistem **dapat direplikasi** karena 5 halaman statis dan 8 produk Robux demo dibuat secara otomatis tanpa intervensi manual. Untuk integrasi WooCommerce versi terbaru, kolom kustom "Username Roblox" pada listing pesanan didaftarkan ganda — pada filter legacy (`manage_edit-shop_order_columns`) dan filter HPOS (`manage_woocommerce_page_wc-orders_columns`) — sehingga sistem berfungsi pada kedua mode storage WooCommerce. Khusus pembayaran QRIS (FT-13), pendekatan **statis dengan verifikasi manual** dipilih sesuai batasan BAB I §1.4 (tanpa integrasi API gateway pihak ketiga) dan disertai konversi halaman Cart/Checkout ke shortcode klasik agar gateway custom tampil pada Block Checkout WooCommerce ≥9.x. **FT-14** mendokumentasikan penyesuaian terhadap stylesheet parent Hello Elementor (`reset.css`), konsolidasi media query responsif, dan invalidasi cache aset lewat `filemtime()`.
 
 > Detail bukti kebenaran setiap fitur (apakah memang berjalan sesuai kebutuhan KF) dilakukan pada pengujian Black Box di `docs/03-pengujian-blackbox.md`.

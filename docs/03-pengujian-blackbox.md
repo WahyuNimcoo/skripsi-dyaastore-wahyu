@@ -14,7 +14,7 @@
 | Scope | Hanya fitur yang **benar-benar diimplementasi** dalam Tugas Akhir (lihat `docs/07-implementasi-fitur.md`) |
 | Aktor uji | Pengunjung, Customer (akun test), Admin (`dyaa_admin`) |
 | Browser uji | Chrome 130 (utama) + Firefox 130 (verifikasi cross-browser) |
-| Viewport uji | Desktop 1920×1080, Tablet 768×1024, Mobile 375×667 |
+| Viewport uji | Desktop ≥1024px, Tablet ≤1024px (drawer sidebar), Mobile ≤768px (bottom nav) |
 | Format hasil | Pass / Fail per Test Case (TC) → ringkasan persentase per kategori |
 
 ### Kolom Tabel
@@ -45,6 +45,9 @@
 | TC-A08 | KF-05 | AT-14a | Klik theme toggle topbar | Klik pill switch di topbar | Body dapat class `dyaa-light`; toggle thumb pindah ke kiri; toggle sidebar ikut sync | _isi_ | _ |
 | TC-A09 | KF-05 | AT-14a | Klik theme toggle sidebar | Klik pill switch di sidebar (mode terang) | Body kehilangan `dyaa-light`; thumb pindah ke kanan; toggle topbar ikut sync; label sidebar berubah ke "Mode Terang" | _isi_ | _ |
 | TC-A10 | KF-05 | AT-14a | Persistensi tema setelah refresh | Aktifkan mode terang lalu hard refresh | Halaman langsung tampil mode terang **tanpa flash gelap** | _isi_ | _ |
+| TC-A11 | KNF-07 | AT-10 | Tombol hamburger tidak pink (Hello Elementor) | Viewport ≤1024px, buka halaman produk, hover + Tab-focus ke `#dyaa-sidebar-toggle` | Latar tombol tetap netral (abu/kartu tema); **bukan** solid pink `#c36` dari `hello-elementor/assets/css/reset.css` | _isi_ | _ |
+| TC-A12 | KF-02 | AT-10 | Sidebar drawer benar-benar off-canvas | Viewport ≤1024px | Sidebar tidak mengambil lebar konten; `transform` menyembunyikan panel; konten utama full width dari kiri (padding body `0`) | _isi_ | _ |
+| TC-A13 | KNF-05 | AT-11 | Cache stylesheet child theme ter-invalidate | Simpan perubahan `style.css` lalu reload sekali (tanpa clear cache manual) | Query string `style.css?ver=` berisi angka Unix (filemtime), bukan hanya nomor versi statis | _isi_ | _ |
 
 ---
 
@@ -200,7 +203,7 @@
 | TC-I04 | KF-36 | AT-14c | Live toast rotasi | Tunggu 8 detik tambahan | Konten toast berganti ke transaksi berikutnya | _isi_ | _ |
 | TC-I05 | KF-36 | AT-14c | Tutup live toast | Klik tombol × | Toast hilang dan tidak muncul lagi sampai refresh | _isi_ | _ |
 | TC-I06 | KNF-04 | AT-01 | Responsive desktop | Viewport 1920×1080 | Layout 3 kolom (sidebar + main + topbar full); tidak ada horizontal scroll | _isi_ | _ |
-| TC-I07 | KNF-04 | AT-01 | Responsive tablet | Viewport 768×1024 | Sidebar collapse; topbar tetap tampil; grid produk jadi 2–3 kolom | _isi_ | _ |
+| TC-I07 | KNF-04 | AT-01 | Responsive tablet | Viewport 1024×768 atau lebih sempit hingga 769px | Sidebar tersembunyi (drawer); tombol hamburger tampil; topbar beri ruang kiri untuk hamburger; tidak ada horizontal scroll | _isi_ | _ |
 | TC-I08 | KNF-04 | AT-01 | Responsive mobile | Viewport 375×667 | Bottom nav muncul; sidebar tersembunyi (hamburger); konten 1 kolom; tidak ada horizontal scroll | _isi_ | _ |
 | TC-I09 | KNF-07 | AT-14a | Pre-paint anti-flash | Set mode terang → close tab → buka kembali | Halaman langsung tampil mode terang, **tanpa flash gelap** sepersekian detik | _isi_ | _ |
 
@@ -210,7 +213,7 @@
 
 | Kategori | Total TC | Pass | Fail | % Berhasil |
 |---|---|---|---|---|
-| A. Akses & Navigasi | 10 | _ | _ | _ |
+| A. Akses & Navigasi | 13 | _ | _ | _ |
 | B. Halaman Statis | 8 | _ | _ | _ |
 | C. Katalog & Produk | 9 | _ | _ | _ |
 | D. Autentikasi | 9 | _ | _ | _ |
@@ -220,7 +223,7 @@
 | G. Manajemen Pesanan Admin | 12 | _ | _ | _ |
 | H. Notifikasi Email | 3 | _ | _ | _ |
 | I. Antarmuka & Fitur Khas | 9 | _ | _ | _ |
-| **TOTAL** | **97** | _ | _ | _ |
+| **TOTAL** | **100** | _ | _ | _ |
 
 ### Rumus Persentase
 ```
@@ -238,7 +241,7 @@
 ### Kesimpulan
 > _Diisi setelah eksekusi_, contoh format:
 >
-> "Berdasarkan hasil pengujian Black Box dengan total 97 *test case* yang dieksekusi pada lingkungan Laragon + WordPress 6.9 + WooCommerce 10.7 + child theme `dyaastore-child`, diperoleh tingkat keberhasilan sebesar **___ %** (Pass: ___, Fail: ___). Sub-kategori F2 (20 TC) khusus memverifikasi gateway pembayaran QRIS (FT-13) yang dibangun sebagai *custom WooCommerce payment gateway* dengan model verifikasi manual via WhatsApp — sesuai batasan BAB I §1.4 yang tidak melibatkan integrasi API payment gateway pihak ketiga. Dengan demikian sistem Dyaa Store dinyatakan **___** sesuai kriteria kelulusan BAB III §3.2.4. Test case yang gagal serta upaya perbaikannya dijelaskan pada Lampiran B."
+> "Berdasarkan hasil pengujian Black Box dengan total 100 *test case* yang dieksekusi pada lingkungan Laragon + WordPress 6.9 + WooCommerce 10.7 + child theme `dyaastore-child`, diperoleh tingkat keberhasilan sebesar **___ %** (Pass: ___, Fail: ___). Sub-kategori F2 (20 TC) khusus memverifikasi gateway pembayaran QRIS (FT-13) yang dibangun sebagai *custom WooCommerce payment gateway* dengan model verifikasi manual via WhatsApp — sesuai batasan BAB I §1.4 yang tidak melibatkan integrasi API payment gateway pihak ketiga. Tiga TC tambahan (TC-A11–TC-A13) memverifikasi kompatibilitas dengan tema parent Hello Elementor (`reset.css`), perilaku sidebar off-canvas, dan invalidasi cache stylesheet lewat `filemtime()` (FT-14). Dengan demikian sistem Dyaa Store dinyatakan **___** sesuai kriteria kelulusan BAB III §3.2.4. Test case yang gagal serta upaya perbaikannya dijelaskan pada Lampiran B."
 
 ---
 

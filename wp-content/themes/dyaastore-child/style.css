@@ -5,13 +5,57 @@ Description: Child theme untuk Dyaa Store — Toko E-Commerce Robux. Berbasis He
 Author: Wahyu Akbar Pratama Siregar
 Author URI: https://dyaastore.test
 Template: hello-elementor
-Version: 2.5.0
+Version: 2.6.3
 Text Domain: dyaastore-child
 */
 
 /* ==========================================================================
    DYAA STORE — Design System
    ========================================================================== */
+
+/* ==========================================================================
+   HELLO ELEMENTOR RESET — KILL  (akar masalah “tanda merah/pink”)
+   --------------------------------------------------------------------------
+   Parent theme Hello Elementor (assets/css/reset.css) memaksa SEMUA tombol:
+     - default:  background transparent, border 1px solid #c36, color #c36
+     - :hover/:focus:  background-color #c36, color #fff
+   Selector `button:hover` punya specificity (0,1,1) — dengan `.class:hover`
+   biasa (0,2,0) sebenarnya class kita SUDAH menang, namun untuk tombol tanpa
+   class (mis. <button> polos) pink tetap muncul. Kita pakai `:where()` agar
+   specificity blok ini tetap (0,1,1) — SAMA dengan parent reset.css — lalu
+   menang lewat urutan cascade (child theme load belakangan). Class custom
+   `.dyaa-cta-*`, `.dyaa-sidebar-toggle`, dll tetap menang lewat class
+   specificity-nya sendiri.
+   ========================================================================== */
+:where(body.dyaa-site) button,
+:where(body.dyaa-site) [type="button"],
+:where(body.dyaa-site) [type="submit"],
+:where(body.dyaa-site) [type="reset"] {
+    background-color: transparent;
+    border: 0;
+    color: inherit;
+}
+:where(body.dyaa-site) button:hover,
+:where(body.dyaa-site) button:focus,
+:where(body.dyaa-site) button:active,
+:where(body.dyaa-site) [type="button"]:hover,
+:where(body.dyaa-site) [type="button"]:focus,
+:where(body.dyaa-site) [type="submit"]:hover,
+:where(body.dyaa-site) [type="submit"]:focus,
+:where(body.dyaa-site) [type="reset"]:hover,
+:where(body.dyaa-site) [type="reset"]:focus {
+    background-color: transparent;
+    color: inherit;
+    text-decoration: none;
+}
+/* Tautan default Hello Elementor juga #c36 — pakai amber sebagai aksen. */
+:where(body.dyaa-site) a {
+    color: var(--dyaa-primary, #f59e0b);
+}
+:where(body.dyaa-site) a:hover,
+:where(body.dyaa-site) a:focus {
+    color: var(--dyaa-primary-dark, #d97706);
+}
 
 /* ==========================================================================
    PALET — Dark-first ala dyaastore.fusionifydigital.store
@@ -22,6 +66,9 @@ Text Domain: dyaastore-child
     /* Brand & accent */
     --dyaa-primary: #f59e0b;          /* gold/amber utama */
     --dyaa-primary-dark: #d97706;     /* hover gold */
+    --dyaa-secondary: #2563eb;        /* biru untuk gradien & aksen (jangan undefined) */
+    --dyaa-navy: #1e3a8a;             /* biru gelap brand */
+    --dyaa-navy-deep: #172554;        /* navy untuk hero / shell */
     --dyaa-accent: #f59e0b;
     --dyaa-success: #22c55e;
     --dyaa-danger: #ef4444;
@@ -42,13 +89,13 @@ Text Domain: dyaastore-child
     --dyaa-border: #1f2a44;
     --dyaa-border-strong: #2c3a5c;
 
-    /* Shape & motion */
+    /* Shape & motion — bayangan lebih “toko nyata”, kurang neon */
     --dyaa-radius: 12px;
     --dyaa-radius-lg: 20px;
-    --dyaa-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
-    --dyaa-shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.6);
-    --dyaa-shadow-glow: 0 8px 24px rgba(245, 158, 11, 0.30);
-    --dyaa-transition: all 0.25s ease;
+    --dyaa-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+    --dyaa-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+    --dyaa-shadow-glow: 0 6px 20px rgba(245, 158, 11, 0.18);
+    --dyaa-transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 
     /* Sidebar metrics */
     --dyaa-sidebar-w: 240px;
@@ -72,10 +119,13 @@ body.dyaa-light {
 }
 
 body {
-    font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    line-height: 1.55;
     color: var(--dyaa-text);
     background: var(--dyaa-bg);
-    transition: var(--dyaa-transition);
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Sembunyikan header/footer minimal Hello Elementor di SEMUA halaman frontend
@@ -470,8 +520,8 @@ body.dyaa-auth-screen .woocommerce-products-header {
     position: sticky;
     top: 0;
     z-index: 10000;
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
-    box-shadow: 0 2px 12px rgba(15, 23, 42, 0.15);
+    background: linear-gradient(135deg, var(--dyaa-navy) 0%, #1d4ed8 100%);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 4px 18px rgba(15, 23, 42, 0.2);
 }
 
 .dyaa-topnav-inner {
@@ -800,102 +850,11 @@ header[role="banner"] {
     box-shadow: var(--dyaa-shadow);
 }
 
+/* Hero: styling utama ada di blok "HERO V2" (bawah file) — hindari duplikasi aturan. */
+
 /* ==========================================================================
-   Hero Section
+   Section umum
    ========================================================================== */
-
-.dyaa-hero {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
-    color: #fff;
-    padding: 60px 24px;
-    border-radius: var(--dyaa-radius-lg);
-    position: relative;
-    overflow: hidden;
-    margin: 24px auto;
-    max-width: 1280px;
-}
-
-.dyaa-hero-grid {
-    display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: 40px;
-    align-items: center;
-    position: relative;
-    z-index: 1;
-    max-width: 1180px;
-    margin: 0 auto;
-}
-
-.dyaa-hero-content {
-    text-align: left;
-}
-
-.dyaa-hero-illustration {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dyaa-hero-illustration img {
-    max-width: 100%;
-    height: auto;
-    max-height: 420px;
-    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.3));
-    animation: dyaa-hero-float 4s ease-in-out infinite;
-}
-
-@keyframes dyaa-hero-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-}
-
-.dyaa-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(245, 158, 11, 0.15) 0%, transparent 50%);
-    pointer-events: none;
-}
-
-.dyaa-hero > * { position: relative; z-index: 1; }
-
-.dyaa-hero-badge {
-    display: inline-block;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    padding: 8px 20px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.dyaa-hero h1 {
-    font-size: 3.2rem;
-    font-weight: 800;
-    margin: 0 0 16px;
-    color: #fff;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-}
-
-.dyaa-hero h1 .accent {
-    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.dyaa-hero p {
-    font-size: 1.15rem;
-    max-width: 640px;
-    margin: 0 auto 32px;
-    opacity: 0.95;
-    line-height: 1.6;
-}
 
 .dyaa-hero-cta {
     display: flex;
@@ -941,10 +900,6 @@ header[role="banner"] {
     background: rgba(255, 255, 255, 0.25);
     color: #fff;
 }
-
-/* ==========================================================================
-   Section umum
-   ========================================================================== */
 
 .dyaa-section {
     max-width: 1280px;
@@ -1003,9 +958,9 @@ header[role="banner"] {
 
 .woocommerce ul.products li.product:hover,
 .dyaa-product-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--dyaa-shadow-lg);
-    border-color: var(--dyaa-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+    border-color: rgba(245, 158, 11, 0.45);
 }
 
 .woocommerce ul.products li.product img {
@@ -1666,59 +1621,9 @@ body.dyaa-dark .dyaa-flashsale {
     }
 }
 
-@media (max-width: 768px) {
-    .dyaa-bottomnav {
-        display: flex;
-    }
-    body { padding-bottom: 64px; }
-    .dyaa-wa-float {
-        bottom: 80px !important;
-    }
-    .dyaa-darkmode-toggle {
-        bottom: 80px !important;
-    }
-    .dyaa-topnav-inner {
-        grid-template-columns: auto 1fr auto;
-        gap: 12px;
-        padding: 10px 14px;
-    }
-    .dyaa-topnav-cta .dyaa-cta-ghost { display: none; }
-    .dyaa-logo-text { display: none; }
-    .dyaa-topnav-wrap .dyaa-logo-img,
-    .dyaa-topnav-logo .dyaa-logo-img { height: 38px !important; max-width: 150px !important; }
-    .dyaa-flashsale-title { font-size: 1.3rem; }
-}
-
-@media (max-width: 640px) {
-    .dyaa-footer-grid {
-        grid-template-columns: 1fr;
-    }
-    .dyaa-hero {
-        padding: 60px 20px;
-    }
-    .dyaa-hero h1 {
-        font-size: 2rem;
-    }
-    .dyaa-section-header h2 {
-        font-size: 1.6rem;
-    }
-    .dyaa-topnav-search {
-        font-size: 0.85rem;
-    }
-    .dyaa-topnav-search input[type="search"] {
-        padding: 7px 4px;
-    }
-    .dyaa-categories-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
-    }
-    .dyaa-category-icon { font-size: 2rem; }
-    .dyaa-countdown-box {
-        font-size: 0.85rem;
-        padding: 5px 8px;
-        min-width: 32px;
-    }
-}
+/* Catatan: aturan responsif terpusat ada di blok "RESPONSIVE FINAL"
+   di bawah file ini (cari "@media (max-width: 1024px)" pertama setelah komentar
+   tersebut). Blok lama (≤768px & ≤640px) dihapus karena duplikatif. */
 
 /* ==========================================================================
    DYAA STORE v2 — Sidebar shell + dark UI ala referensi
@@ -1726,23 +1631,23 @@ body.dyaa-dark .dyaa-flashsale {
    ========================================================================== */
 
 html, html body {
-    background: #0a0e1a !important;
-    color: #f8fafc;
+    background: var(--dyaa-bg) !important;
+    color: var(--dyaa-text);
 }
 html body.dyaa-light {
-    background: #ffffff !important;
-    color: #0f172a;
+    background: var(--dyaa-bg) !important;
+    color: var(--dyaa-text);
 }
 body.dyaa-site {
-    background: #0a0e1a !important;
-    color: #f8fafc;
+    background: var(--dyaa-bg) !important;
+    color: var(--dyaa-text);
     padding-left: var(--dyaa-sidebar-w);
     min-height: 100vh;
     overflow-x: hidden;
 }
 body.dyaa-light.dyaa-site {
-    background: #ffffff !important;
-    color: #0f172a;
+    background: var(--dyaa-bg) !important;
+    color: var(--dyaa-text);
 }
 body.dyaa-site main,
 body.dyaa-site #content,
@@ -1774,12 +1679,6 @@ body.dyaa-site select:focus {
 }
 body.dyaa-site label { color: var(--dyaa-text); font-weight: 600; }
 
-/* Sembunyikan header/footer Hello Elementor secara konsisten */
-body.dyaa-site #site-header.site-header,
-body.dyaa-site #site-footer.site-footer {
-    display: none !important;
-}
-
 /* ----------------------- SIDEBAR ----------------------- */
 html body .dyaa-sidebar,
 .dyaa-sidebar {
@@ -1788,12 +1687,12 @@ html body .dyaa-sidebar,
     left: 0;
     bottom: 0;
     width: var(--dyaa-sidebar-w);
-    background: #0d1325 !important;
-    border-right: 1px solid #1f2a44 !important;
+    background: var(--dyaa-bg-sidebar) !important;
+    border-right: 1px solid var(--dyaa-border) !important;
     display: flex;
     flex-direction: column;
     z-index: 100;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.45);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.35);
     transition: transform 0.3s ease;
 }
 html body.dyaa-light .dyaa-sidebar {
@@ -1812,12 +1711,14 @@ html body.dyaa-light .dyaa-sidebar {
     color: var(--dyaa-text);
 }
 .dyaa-sidebar-logo {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     object-fit: contain;
     border-radius: 8px;
-    background: var(--dyaa-bg-elev);
-    padding: 4px;
+    background: transparent;
+    padding: 0;
+    flex-shrink: 0;
+    display: block;
 }
 .dyaa-sidebar-brand-text {
     font-weight: 800;
@@ -2139,9 +2040,9 @@ body.dyaa-site:not(.dyaa-landing) #content {
     border-radius: var(--dyaa-radius-lg);
     overflow: hidden;
     background:
-        radial-gradient(1200px 360px at 80% 30%, rgba(245, 158, 11, 0.18), transparent 60%),
-        radial-gradient(900px 300px at 10% 80%, rgba(168, 85, 247, 0.15), transparent 60%),
-        linear-gradient(135deg, #1e1a3a 0%, #181227 50%, #2a1a3e 100%);
+        radial-gradient(1000px 340px at 78% 22%, rgba(245, 158, 11, 0.13), transparent 58%),
+        radial-gradient(760px 280px at 14% 82%, rgba(37, 99, 235, 0.12), transparent 58%),
+        linear-gradient(148deg, #0f172a 0%, #1e293b 46%, #172554 100%);
     border: 1px solid var(--dyaa-border-strong);
     min-height: 360px;
     box-shadow: var(--dyaa-shadow-lg);
@@ -2171,7 +2072,7 @@ body.dyaa-site:not(.dyaa-landing) #content {
     width: auto;
     max-width: none;
     filter: drop-shadow(0 16px 32px rgba(0, 0, 0, 0.5));
-    animation: dyaa-float 4s ease-in-out infinite;
+    animation: dyaa-float 5.5s ease-in-out infinite;
 }
 .dyaa-hero .dyaa-hero-badge {
     display: inline-flex;
@@ -2187,22 +2088,22 @@ body.dyaa-site:not(.dyaa-landing) #content {
     border: 1px solid rgba(245, 158, 11, 0.3);
 }
 .dyaa-hero h1 {
-    font-size: clamp(2.4rem, 5.5vw, 4.5rem);
-    font-weight: 900;
-    line-height: 1.0;
-    letter-spacing: -0.02em;
+    font-size: clamp(2rem, 4.2vw, 3.25rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
     margin: 0 0 18px;
     color: #fff;
-    text-transform: uppercase;
-    text-shadow: 0 4px 24px rgba(245, 158, 11, 0.35);
+    text-transform: none;
+    text-shadow: 0 2px 14px rgba(0, 0, 0, 0.28);
 }
 .dyaa-hero h1 .accent {
-    background: linear-gradient(180deg, #fde047 0%, #f59e0b 50%, #ea580c 100%);
+    background: linear-gradient(180deg, #fde68a 0%, #f59e0b 55%, #d97706 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     color: #f59e0b;
-    filter: drop-shadow(0 2px 4px rgba(245, 158, 11, 0.4));
+    filter: none;
 }
 .dyaa-hero p {
     color: rgba(255, 255, 255, 0.82);
@@ -2217,18 +2118,22 @@ body.dyaa-site:not(.dyaa-landing) #content {
     gap: 12px;
 }
 .dyaa-hero .dyaa-btn-primary {
-    background: linear-gradient(135deg, #f59e0b, #f97316);
+    background: var(--dyaa-primary);
     color: #1a1100;
     padding: 14px 28px;
     border-radius: 12px;
-    font-weight: 800;
+    font-weight: 700;
     text-decoration: none;
     font-size: 0.98rem;
-    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.4);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.28);
     transition: var(--dyaa-transition);
     border: 0;
 }
-.dyaa-hero .dyaa-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(245, 158, 11, 0.55); }
+.dyaa-hero .dyaa-btn-primary:hover {
+    background: var(--dyaa-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.34);
+}
 .dyaa-hero .dyaa-btn-secondary {
     background: rgba(255, 255, 255, 0.12);
     color: #fff;
@@ -2244,7 +2149,7 @@ body.dyaa-site:not(.dyaa-landing) #content {
 
 @keyframes dyaa-float {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    50% { transform: translateY(-5px); }
 }
 
 /* ----------------------- SECTION HEADER (vertical orange bar) ----------------------- */
@@ -2659,7 +2564,7 @@ body.dyaa-light.dyaa-site .woocommerce ul.products li.product .woocommerce-loop-
     box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35) !important;
 }
 
-/* ----------------------- WHATSAPP STICKER (mascot bottom-right) ----------------------- */
+/* ----------------------- WHATSAPP STICKER (bottom-right chat widget) ----------------------- */
 .dyaa-wa-float { display: none !important; }
 .dyaa-darkmode-toggle { display: none !important; }
 
@@ -2668,49 +2573,86 @@ body.dyaa-light.dyaa-site .woocommerce ul.products li.product .woocommerce-loop-
     bottom: 22px;
     right: 22px;
     z-index: 96;
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
     align-items: center;
+    gap: 12px;
+    padding: 10px 14px 10px 16px;
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 999px;
     text-decoration: none;
-    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(15, 23, 42, 0.16), 0 2px 6px rgba(15, 23, 42, 0.08);
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    max-width: calc(100vw - 44px);
 }
-.dyaa-wa-sticker-balloon {
-    background: #f59e0b;
-    color: #1a1100;
-    padding: 6px 12px;
-    border-radius: 14px 14px 14px 4px;
-    font-weight: 900;
-    font-size: 0.65rem;
-    line-height: 1.2;
-    text-align: center;
-    margin-bottom: 6px;
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
-    text-transform: uppercase;
-    display: flex;
+.dyaa-wa-sticker:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.22), 0 4px 10px rgba(15, 23, 42, 0.1);
+    color: #0f172a;
+}
+.dyaa-wa-sticker:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.35), 0 10px 26px rgba(15, 23, 42, 0.16);
+}
+.dyaa-wa-sticker-label {
+    display: inline-flex;
     flex-direction: column;
-    gap: 2px;
-    transform: rotate(-4deg);
-    animation: dyaa-wiggle 3s ease-in-out infinite;
+    line-height: 1.15;
+    text-align: left;
+    min-width: 0;
 }
-.dyaa-wa-line-1 { color: #1a1100; }
-.dyaa-wa-line-2 { color: #ef4444; }
-.dyaa-wa-sticker-mascot {
-    width: 56px;
-    height: 56px;
+.dyaa-wa-sticker-title {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.005em;
+}
+.dyaa-wa-sticker-sub {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #64748b;
+    margin-top: 1px;
+}
+.dyaa-wa-sticker-icon {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: #25d366;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.5);
-    transition: var(--dyaa-transition);
+    flex-shrink: 0;
+    box-shadow: 0 4px 10px rgba(37, 211, 102, 0.35);
 }
-.dyaa-wa-sticker:hover .dyaa-wa-sticker-mascot {
-    transform: scale(1.06);
+/* Dark mode: pill berlatar gelap dengan border halus */
+body:not(.dyaa-light) .dyaa-wa-sticker {
+    background: #111827;
+    color: #f8fafc;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
 }
-@keyframes dyaa-wiggle {
-    0%, 100% { transform: rotate(-4deg); }
-    50% { transform: rotate(4deg); }
+body:not(.dyaa-light) .dyaa-wa-sticker-title { color: #f8fafc; }
+body:not(.dyaa-light) .dyaa-wa-sticker-sub { color: #94a3b8; }
+/* Mobile: collapse jadi ikon bulat saja (tetap accessible via aria-label) */
+@media (max-width: 480px) {
+    .dyaa-wa-sticker {
+        padding: 0;
+        background: #25d366;
+        border-color: transparent;
+        gap: 0;
+        bottom: 16px;
+        right: 16px;
+    }
+    .dyaa-wa-sticker-label { display: none; }
+    .dyaa-wa-sticker-icon {
+        width: 52px;
+        height: 52px;
+        box-shadow: 0 6px 16px rgba(37, 211, 102, 0.45);
+    }
+    body:not(.dyaa-light) .dyaa-wa-sticker {
+        background: #25d366;
+    }
 }
 
 /* ----------------------- FOOTER DARK ----------------------- */
@@ -2784,27 +2726,46 @@ body.dyaa-light.dyaa-site .woocommerce ul.products li.product .woocommerce-loop-
 .dyaa-bn-item.is-active { color: var(--dyaa-primary); }
 .dyaa-bn-icon { color: inherit; }
 
-/* ----------------------- RESPONSIVE ----------------------- */
+/* ==========================================================================
+   RESPONSIVE FINAL — sumber tunggal kebenaran untuk breakpoint
+   --------------------------------------------------------------------------
+   Aturan sidebar utama (line ~1689) memakai selector specificity tinggi
+   (`html body .dyaa-sidebar`), jadi di sini kita pertahankan specificity
+   yang sama supaya media query benar-benar override.
+   ========================================================================== */
+
+/* ≤1024px — sidebar jadi drawer, hamburger muncul */
 @media (max-width: 1024px) {
-    body.dyaa-site { padding-left: 0; }
+    html body.dyaa-site { padding-left: 0 !important; }
+    html body .dyaa-sidebar,
     .dyaa-sidebar {
         transform: translateX(-100%);
+        box-shadow: none;
     }
+    html body .dyaa-sidebar.is-open,
     .dyaa-sidebar.is-open {
         transform: translateX(0);
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.35);
     }
-    .dyaa-sidebar-toggle { display: flex; }
-    .dyaa-topnav-inner {
-        padding-left: 70px;
-    }
+    .dyaa-sidebar-toggle { display: inline-flex !important; }
+    .dyaa-topnav-inner { padding-left: 70px; }
     .dyaa-live-toast { left: 16px; }
     .dyaa-categories-grid { grid-template-columns: repeat(3, 1fr); }
-    .dyaa-hero .dyaa-hero-content { max-width: 65%; padding: 44px 20px 44px 36px; }
+    .dyaa-hero .dyaa-hero-content { max-width: 62%; padding: 44px 20px 44px 36px; }
 }
 
+/* ≤768px — bottom nav muncul, hero stack vertikal */
 @media (max-width: 768px) {
+    body { padding-bottom: 68px; }
+    .dyaa-bottomnav { display: flex; }
+
+    /* WA sticker jangan ditutup bottom nav */
+    .dyaa-wa-sticker { bottom: 84px !important; }
+    /* Sidebar drawer mengambil alih → sembunyikan bottom nav agar tidak menumpuk */
+    body.dyaa-sidebar-open .dyaa-bottomnav { display: none; }
+
     .dyaa-hero .dyaa-hero-grid { min-height: auto; }
-    .dyaa-hero .dyaa-hero-content { max-width: 100%; padding: 36px 24px 28px; }
+    .dyaa-hero .dyaa-hero-content { max-width: 100%; padding: 36px 24px 24px; }
     .dyaa-hero .dyaa-hero-illustration {
         position: relative;
         width: 100%;
@@ -2816,23 +2777,49 @@ body.dyaa-light.dyaa-site .woocommerce ul.products li.product .woocommerce-loop-
         bottom: 0;
         transform: translateX(50%);
         height: 100%;
+        max-width: 80%;
+        object-fit: contain;
     }
+    .dyaa-hero h1 { font-size: clamp(1.7rem, 6vw, 2.2rem); }
+
     .dyaa-categories-grid { grid-template-columns: repeat(2, 1fr); }
-    .dyaa-flashsale-header { flex-direction: column; align-items: flex-start; }
+    .dyaa-flashsale-header { flex-direction: column; align-items: flex-start; gap: 10px; }
     .dyaa-countdown { margin-left: 0; }
-    .dyaa-cta-ghost { display: none; }
-    .dyaa-topnav-icon-btn { width: 38px; height: 38px; }
+
+    /* Topbar mobile: search lebih ramping, "Daftar" hilang, ikon mengecil */
+    .dyaa-topnav-inner { padding-left: 64px; padding-right: 14px; gap: 10px; }
     .dyaa-topnav-search { padding: 6px 12px; }
+    .dyaa-topnav-icon-btn { width: 38px; height: 38px; }
     .dyaa-cta { padding: 8px 14px; font-size: 0.86rem; }
-    .dyaa-wa-sticker-balloon { display: none; }
-    body.dyaa-site .dyaa-homepage { padding: 16px 16px 80px; }
+    .dyaa-topnav-cta .dyaa-cta-ghost,
+    .dyaa-topnav-actions .dyaa-cta-ghost { display: none; }
+
+    body.dyaa-site .dyaa-homepage { padding: 16px 16px 96px; }
+    body.dyaa-site:not(.dyaa-landing) main,
+    body.dyaa-site:not(.dyaa-landing) .site-main,
+    body.dyaa-site:not(.dyaa-landing) #content {
+        padding: 18px 14px 96px;
+    }
 }
 
+/* ≤640px — footer 1 kolom, hero teks lebih kecil */
+@media (max-width: 640px) {
+    .dyaa-footer-grid { grid-template-columns: 1fr; }
+    .dyaa-section-header h2 { font-size: 1.6rem; }
+    .dyaa-topnav-actions { gap: 6px; }
+}
+
+/* ≤480px — small mobile, label "Akun Saya" dikorbankan agar tidak overflow */
 @media (max-width: 480px) {
-    .dyaa-hero h1 { font-size: 2.2rem; }
-    .dyaa-section-header h2 { font-size: 1.2rem; }
+    .dyaa-section-header h2 { font-size: 1.25rem; }
     .dyaa-categories-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .dyaa-category-card { min-height: 170px; padding: 80px 10px 14px; }
+    .dyaa-category-card { min-height: 160px; padding: 78px 10px 14px; }
+    .dyaa-topnav-search input[type="search"] { font-size: 0.85rem; }
+
+    /* "Masuk / Akun Saya" jadi ikon-only di small phone */
+    .dyaa-cta-solid { padding: 8px 10px; font-size: 0; gap: 0; }
+    .dyaa-cta-solid .dyaa-cta-ico { font-size: initial; }
+    .dyaa-cta-solid .dyaa-cta-ico .dyaa-icon { width: 18px; height: 18px; }
 }
 
 /* ==========================================================================
@@ -4241,13 +4228,14 @@ body.dyaa-light .dyaa-theme-toggle:not(.is-light) .dyaa-theme-toggle-icon--moon 
     display: flex !important;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 10px 14px;
+    gap: 8px;
+    padding: 8px 12px;
     margin: 4px 0;
-    border-radius: 12px;
+    border-radius: 10px;
     background: var(--dyaa-bg-elev, rgba(255, 255, 255, 0.04));
     border: 1px solid var(--dyaa-border, rgba(255, 255, 255, 0.08));
     transition: var(--dyaa-transition);
+    min-height: 44px;
 }
 .dyaa-side-theme-row:hover {
     border-color: rgba(245, 158, 11, 0.35);
@@ -4255,22 +4243,38 @@ body.dyaa-light .dyaa-theme-toggle:not(.is-light) .dyaa-theme-toggle-icon--moon 
 .dyaa-side-theme-label {
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    color: var(--dyaa-text-muted);
-    font-size: 0.9rem;
+    gap: 8px;
+    color: var(--dyaa-text);
+    font-size: 0.85rem;
     font-weight: 600;
-    line-height: 1;
+    line-height: 1.2;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .dyaa-side-theme-label .dyaa-side-ico {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     color: var(--dyaa-primary);
+    flex-shrink: 0;
 }
 .dyaa-side-theme-text {
     color: var(--dyaa-text);
+    white-space: nowrap;
+}
+.dyaa-side-theme-row .dyaa-theme-toggle {
+    flex-shrink: 0;
+}
+/* Pill toggle di dalam sidebar lebih kompak supaya label tidak wrap */
+.dyaa-side-theme-row .dyaa-theme-toggle-track {
+    --tt-w: 48px;
+    --tt-h: 24px;
+    --tt-pad: 3px;
 }
 
 /* Hilangkan ::marker bullet point (li bawaan) */
@@ -4507,5 +4511,214 @@ body.dyaa-light .dyaa-qris-note {
     padding: 3px;
     vertical-align: middle;
     box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
+
+/* ==========================================================================
+   WooCommerce Blocks (Cart & Checkout) — selaraskan dark/light mode
+   --------------------------------------------------------------------------
+   WC ≥9 menjadikan Cart/Checkout berbasis blok dengan kelas
+   `.wc-block-components-*`. Tema klasik kita meng-override hanya
+   `<input>` polos, jadi blok input tampil putih solid di mode gelap.
+   Aturan di bawah memetakan blok input ke variabel tema kita.
+   ========================================================================== */
+
+body.dyaa-site .wc-block-components-form,
+body.dyaa-site .wc-block-checkout,
+body.dyaa-site .wc-block-cart,
+body.dyaa-site .wp-block-woocommerce-checkout,
+body.dyaa-site .wp-block-woocommerce-cart {
+    color: var(--dyaa-text);
+}
+
+/* Section / step (Contact information, Billing address, Payment options) */
+body.dyaa-site .wc-block-components-checkout-step,
+body.dyaa-site .wc-block-components-checkout-step__container {
+    background: transparent;
+    color: var(--dyaa-text);
+}
+body.dyaa-site .wc-block-components-checkout-step__title,
+body.dyaa-site .wc-block-components-title {
+    color: var(--dyaa-text) !important;
+}
+body.dyaa-site .wc-block-components-checkout-step__description,
+body.dyaa-site .wc-block-components-form__description,
+body.dyaa-site .wc-block-components-checkout-step__heading-content {
+    color: var(--dyaa-text-muted) !important;
+}
+
+/* Input wrapper + native input/textarea/select inside checkout blocks */
+body.dyaa-site .wc-block-components-text-input,
+body.dyaa-site .wc-block-components-select {
+    background: transparent;
+}
+body.dyaa-site .wc-block-components-text-input input,
+body.dyaa-site .wc-block-components-text-input input.input-text,
+body.dyaa-site .wc-block-components-select select,
+body.dyaa-site .wc-block-components-textarea,
+body.dyaa-site .wc-block-components-checkout-step textarea,
+body.dyaa-site .wc-block-components-address-form input,
+body.dyaa-site .wc-block-components-address-form select,
+body.dyaa-site .wc-block-components-address-form textarea {
+    background: var(--dyaa-bg-card) !important;
+    color: var(--dyaa-text) !important;
+    border: 1px solid var(--dyaa-border) !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+}
+body.dyaa-site .wc-block-components-text-input input:focus,
+body.dyaa-site .wc-block-components-select select:focus,
+body.dyaa-site .wc-block-components-textarea:focus,
+body.dyaa-site .wc-block-components-address-form input:focus,
+body.dyaa-site .wc-block-components-address-form select:focus,
+body.dyaa-site .wc-block-components-address-form textarea:focus {
+    border-color: var(--dyaa-primary) !important;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18) !important;
+    outline: 0 !important;
+}
+body.dyaa-site .wc-block-components-text-input label,
+body.dyaa-site .wc-block-components-select label,
+body.dyaa-site .wc-block-components-textarea label {
+    color: var(--dyaa-text-muted) !important;
+    background: transparent !important;
+}
+/* Saat field terisi/focused, label naik ke atas: pastikan tidak ada bg putih nyangkut */
+body.dyaa-site .wc-block-components-text-input.is-active label,
+body.dyaa-site .wc-block-components-text-input input:focus + label {
+    color: var(--dyaa-primary) !important;
+}
+
+/* "Edit" button di panel summary alamat */
+body.dyaa-site .wc-block-components-address-card__edit,
+body.dyaa-site .wc-block-components-button.wc-block-components-button--link {
+    color: var(--dyaa-primary) !important;
+}
+
+/* Order summary card (right side) */
+body.dyaa-site .wc-block-components-order-summary,
+body.dyaa-site .wc-block-components-sidebar-layout__sidebar > .wp-block-woocommerce-checkout-order-summary-block,
+body.dyaa-site .wc-block-checkout__sidebar,
+body.dyaa-site .wc-block-cart__sidebar {
+    background: var(--dyaa-bg-card);
+    border: 1px solid var(--dyaa-border);
+    border-radius: var(--dyaa-radius-lg);
+    padding: 18px;
+}
+body.dyaa-site .wc-block-components-product-name,
+body.dyaa-site .wc-block-components-order-summary-item__quantity {
+    color: var(--dyaa-text) !important;
+}
+body.dyaa-site .wc-block-components-product-metadata,
+body.dyaa-site .wc-block-components-order-summary-item__description,
+body.dyaa-site .wc-block-components-totals-item__label {
+    color: var(--dyaa-text-muted) !important;
+}
+body.dyaa-site .wc-block-components-totals-item__value,
+body.dyaa-site .wc-block-components-product-price,
+body.dyaa-site .wc-block-formatted-money-amount {
+    color: var(--dyaa-text) !important;
+}
+body.dyaa-site .wc-block-components-totals-footer-item .wc-block-components-totals-item__value,
+body.dyaa-site .wc-block-components-totals-footer-item__value {
+    color: var(--dyaa-primary) !important;
+}
+body.dyaa-site .wc-block-components-panel,
+body.dyaa-site .wc-block-components-panel__button {
+    color: var(--dyaa-text) !important;
+    background: transparent !important;
+}
+body.dyaa-site .wc-block-components-totals-item,
+body.dyaa-site .wc-block-components-order-summary-item {
+    border-color: var(--dyaa-border) !important;
+}
+
+/* Pilihan "Add a note to your order" + checkbox */
+body.dyaa-site .wc-block-components-checkbox__label,
+body.dyaa-site .wc-block-components-checkbox__input + .wc-block-components-checkbox__mark + .wc-block-components-checkbox__label {
+    color: var(--dyaa-text) !important;
+}
+body.dyaa-site .wc-block-components-checkbox__mark {
+    border-color: var(--dyaa-border-strong) !important;
+    background: var(--dyaa-bg-card) !important;
+}
+
+/* Payment option card */
+body.dyaa-site .wc-block-components-payment-method,
+body.dyaa-site .wc-block-components-radio-control__option {
+    background: var(--dyaa-bg-card) !important;
+    border: 1px solid var(--dyaa-border) !important;
+    border-radius: var(--dyaa-radius) !important;
+    color: var(--dyaa-text) !important;
+}
+body.dyaa-site .wc-block-components-payment-method--selected,
+body.dyaa-site .wc-block-components-radio-control__option--selected {
+    border-color: var(--dyaa-primary) !important;
+    box-shadow: inset 0 0 0 1px var(--dyaa-primary);
+}
+body.dyaa-site .wc-block-components-payment-method__name,
+body.dyaa-site .wc-block-components-radio-control__label {
+    color: var(--dyaa-text) !important;
+}
+
+/* Tombol Place Order (Block) */
+body.dyaa-site .wc-block-components-checkout-place-order-button,
+body.dyaa-site .wc-block-checkout__actions_row .wc-block-components-button {
+    background: var(--dyaa-primary) !important;
+    color: #1a1100 !important;
+    border-radius: 12px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 6px 18px rgba(245, 158, 11, 0.25);
+}
+
+/* Light-mode tweaks: kartu summary tetap putih, border lebih halus */
+body.dyaa-light .wc-block-components-order-summary,
+body.dyaa-light .wc-block-checkout__sidebar,
+body.dyaa-light .wc-block-cart__sidebar {
+    background: #ffffff;
+    border-color: var(--dyaa-border);
+}
+
+/* ==========================================================================
+   Focus & defensive — supaya tidak ada outline “pink/merah” default browser
+   ========================================================================== */
+body.dyaa-site :focus {
+    outline: none;
+}
+body.dyaa-site :focus-visible {
+    outline: 2px solid var(--dyaa-primary);
+    outline-offset: 2px;
+    border-radius: 6px;
+}
+/* Tombol & form fields tetap memakai box-shadow ring (lebih natural) */
+body.dyaa-site button:focus-visible,
+body.dyaa-site .dyaa-cta:focus-visible,
+body.dyaa-site .dyaa-topnav-icon-btn:focus-visible,
+body.dyaa-site .dyaa-side-link:focus-visible,
+body.dyaa-site .dyaa-bn-item:focus-visible,
+body.dyaa-site .dyaa-sidebar-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.4);
+}
+
+/* Pastikan sidebar tidak mengintip keluar viewport saat di-drawer.
+   Hello Elementor / WordPress theme system kadang menambah margin-left auto
+   atau width override yang membuat translateX -100% kurang. */
+html body .dyaa-sidebar {
+    will-change: transform;
+}
+
+/* ==========================================================================
+   Aksesibilitas: kurangi animasi “demo” bila user meminta reduced motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .dyaa-hero .dyaa-hero-illustration img,
+    .dyaa-hero-illustration img {
+        animation: none !important;
+    }
+    .dyaa-wa-sticker {
+        transition: none !important;
+    }
+    html body .dyaa-sidebar {
+        transition: none !important;
+    }
 }
 
