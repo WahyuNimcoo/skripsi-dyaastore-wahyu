@@ -137,7 +137,6 @@ c:\laragon\www\dyaastore\
 
 - **Hardware**: Intel Core i5, RTX 3050, 16GB DDR4, SSD 512GB
 - **OS**: Windows 10/11 64-bit
-- **Lokasi**: Kec. Muara Sat, Kota Lhokseumawe, Prov. Aceh
 
 ## Referensi & Inspirasi UI
 
