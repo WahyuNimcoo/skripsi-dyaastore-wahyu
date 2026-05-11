@@ -82,7 +82,7 @@ Tabel berikut adalah daftar KF beserta status implementasi dan **referensi file*
 | KF-21 | Customer | Sistem dapat **mengubah jumlah** atau **menghapus** item di keranjang                                                                                    | ✅                       | WooCommerce native                                                                   |
 | KF-22 | Customer | Halaman **Checkout** menampilkan ringkasan pesanan + form data pembeli                                                                                   | ✅                       | WooCommerce native                                                                   |
 | KF-23 | Customer | Form Checkout berisi field tambahan **Username Roblox** (wajib, validasi 3–20 karakter alfanumerik+underscore)                                           | ✅                       | `functions.php → dyaastore_add_roblox_field()` + `dyaastore_validate_roblox_field()` |
-| KF-24 | Customer | Sistem menyediakan minimal satu metode pembayaran aktif (**Direct Bank Transfer**); metode lain (e-wallet, QRIS, VA) opsional via plugin payment gateway | ✅ default / ⚠️ opsional | WooCommerce → Settings → Payments                                                    |
+| KF-24 | Customer | Sistem menyediakan metode pembayaran **QRIS statis** (scan & bayar) dengan verifikasi manual via WhatsApp + **Direct Bank Transfer** sebagai metode cadangan                                            | ✅                       | `inc/class-wc-dyaa-qris-gateway.php` (custom WC gateway) + `functions.php → dyaastore_register_qris_gateway()` + `assets/img/dyaa-qris.png` |
 | KF-25 | Customer | Sistem menampilkan halaman **Thank You** dengan Username Roblox tercantum                                                                                | ✅                       | `functions.php → dyaastore_display_roblox_in_thankyou()`                             |
 
 
@@ -111,7 +111,7 @@ Tabel berikut adalah daftar KF beserta status implementasi dan **referensi file*
 | KF-36 | Pengunjung | Sistem menampilkan **live transaction toast** (social proof) di pojok kiri-bawah         | ✅      | `functions.php → dyaastore_render_live_toast()` + JS rotator     |
 
 
-**Total KF**: 36 (semua ✅ kecuali KF-24 sebagian opsional). Daftar ini menjadi pondasi tabel pengujian Black Box di `docs/03-pengujian-blackbox.md`.
+**Total KF**: 36 (semua ✅ terimplementasi). Daftar ini menjadi pondasi tabel pengujian Black Box di `docs/03-pengujian-blackbox.md`.
 
 ---
 
@@ -135,7 +135,7 @@ Tabel berikut adalah daftar KF beserta status implementasi dan **referensi file*
 
 1. ❌ **Tanpa integrasi API resmi Roblox** — pengiriman Robux dilakukan **manual** oleh admin (gamepass / group payout).
 2. ❌ **Tanpa pengembangan backend custom** di luar ekosistem WordPress (semua logic ditulis sebagai child theme & mu-plugins).
-3. ✅ Pembayaran terbatas pada **Direct Bank Transfer** (bawaan WooCommerce). E-wallet/QRIS/VA tersedia jika admin menambah plugin gateway pihak ketiga (mis. Tripay, Duitku, Midtrans) — di luar cakupan inti skripsi.
+3. ✅ Pembayaran menggunakan **QRIS statis** (custom WooCommerce gateway `WC_Dyaa_QRIS_Gateway`) yang menampilkan QR resmi Dyaa Store (NMID `ID1026477730984`) di halaman *Thank You*; verifikasi pembayaran dilakukan admin **secara manual** setelah customer mengirim bukti via WhatsApp. **Direct Bank Transfer** disediakan sebagai metode cadangan. Skema ini sengaja **tidak** memakai integrasi API payment gateway pihak ketiga karena di luar cakupan skripsi (§1.4).
 4. ✅ Fitur dibatasi pada inti e-commerce + halaman pendukung (FAQ, Tentang, Syarat, Privasi, Dukungan).
 5. ❌ **Tanpa** sistem rekomendasi otomatis, integrasi marketplace pihak ketiga, atau analitik lanjutan.
 6. ✅ Lingkungan target adalah **server lokal Laragon** (Apache + MySQL + PHP) dengan opsi deploy ke hosting cPanel.

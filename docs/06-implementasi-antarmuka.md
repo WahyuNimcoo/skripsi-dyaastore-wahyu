@@ -15,7 +15,7 @@
 | AT-03 | Halaman Detail Produk |
 | AT-04 | Halaman Keranjang |
 | AT-05 | Halaman Checkout (dengan custom field Roblox) |
-| AT-06 | Halaman Thank You / Order Received |
+| AT-06 | Halaman Thank You / Order Received (+ Panel QRIS) |
 | AT-07 | Halaman My Account (Split-Screen Login + Daftar) |
 | AT-08 | Halaman Akun Saya (setelah login) |
 | AT-09 | 5 Halaman Statis (Tentang, FAQ, Syarat, Privasi, Dukungan) |
@@ -156,23 +156,64 @@ Layout 2 kolom (desktop): kiri = form billing, kanan = order summary.
 
 Notice ditampilkan di atas form (warna merah, sesuai default WooCommerce).
 
+### Payment Methods (KF-24)
+
+Section "Order" menampilkan daftar radio metode pembayaran. Setelah QRIS
+gateway terdaftar, urutan default:
+
+1. ◉ **QRIS (Scan & Bayar)** ← dipilih default · thumbnail QR kecil 44px di sebelah label · saat dipilih, deskripsi "Bayar dengan scan QRIS pakai aplikasi e-wallet..." muncul.
+2. ○ Direct Bank Transfer (cadangan, dikonfigurasi admin).
+
+Tombol "Place order" memicu `WC_Dyaa_QRIS_Gateway::process_payment()` →
+order status `on-hold` → redirect ke `/checkout/order-received/{id}/`
+(AT-06).
+
 ---
 
 ## AT-06 — Halaman Thank You
 
-| Atribut | Detail |
-|---|---|
-| **URL** | `/checkout/order-received/{order-id}/?key=...` |
-| **Sumber** | WooCommerce native + injeksi custom |
-| **KF terkait** | KF-25, KF-32 |
-| **Screenshot** | `docs/screenshots/06-thankyou.png` |
+| Atribut          | Detail                                                                                                                                  |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **URL**          | `/checkout/order-received/{order-id}/?key=...`                                                                                          |
+| **Sumber**       | WooCommerce native + injeksi custom                                                                                                     |
+| **KF terkait**   | KF-24, KF-25, KF-32                                                                                                                     |
+| **Screenshot**   | `docs/screenshots/06-thankyou-qris-dark.png`, `06-thankyou-qris-light.png`                                                              |
 
-### Yang Tampil
+### AT-06a — Header Konfirmasi Order
+
 - Header "Thank you. Your order has been received."
 - Tabel ringkasan: Order number, Date, Total, Payment method.
-- Instruksi pembayaran (jika Direct Bank Transfer): rekening bank yang sudah di-setting admin.
 - **Username Roblox tercantum** sebelum tabel detail order (custom dari `dyaastore_display_roblox_in_thankyou()`).
 - Tabel order detail (produk, qty, subtotal).
+
+### AT-06b — Panel QRIS (jika metode pembayaran = QRIS)
+
+Render via `WC_Dyaa_QRIS_Gateway::thankyou_page()` ketika
+`woocommerce_thankyou_dyaa_qris` action fired. Konten:
+
+
+| Elemen               | Komposisi & Behavior                                                                                            |
+| -------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Brand-line pill      | Badge "QRIS" oranye + nama merchant "dya store" + NMID "ID1026477730984"                                        |
+| Judul                | "Scan QR untuk Membayar" (H2)                                                                                   |
+| Sub-judul            | "Pesanan #{order_number} menunggu pembayaran sebesar Rp{total}"                                                 |
+| Kolom kiri (QR)      | Gambar QRIS resmi (`dyaa-qris.png`, white bg, rounded 18px, max-width 320px) + link "Unduh gambar QR"           |
+| Kolom kanan (instr.) | H3 "Langkah Pembayaran" + 4 langkah (buka e-wallet → scan → bayar → kirim bukti WA)                             |
+| Box nominal          | Card glass dengan 2 baris: "Nominal" (oranye, font monospace) & "Nomor Pesanan" (#{order_number})               |
+| CTA WhatsApp         | Tombol pill hijau (gradient `#25d366→#128c7e`) "Kirim Bukti Pembayaran via WhatsApp →" → deeplink `wa.me/`      |
+| Note refund/SLA      | Paragraf border-kiri oranye: rata-rata 5-10 menit pada jam kerja 08.00–22.00 WIB                                |
+
+**Tema gelap (default)**: gradient oranye→biru gelap (`rgba(245,158,11,.12)` → `rgba(11,23,64,.55)`).
+**Tema terang** (kelas `body.dyaa-light`): gradient krem (`#fff7ed → #ffffff`),
+border oranye lembut, shadow oranye samar.
+
+**Responsif**: grid 2 kolom (QR | instruksi) di ≥768px, single column di <768px (QR di atas, instruksi di bawah). Padding panel mengecil dari 28px → 20px di mobile.
+
+### AT-06c — Email Konfirmasi Customer
+
+Hook `woocommerce_email_before_order_table` (priority 10) menempel blok
+HTML berwarna krem dengan: judul, total, instruksi, gambar QR (max-width 280px), dan tombol hijau WhatsApp. Versi plain-text di-render lewat
+cabang `$plain_text === true`.
 
 ---
 
@@ -487,7 +528,7 @@ Di `/wp-admin/index.php` (halaman utama wp-admin) tampil widget **🎮 Dyaa Stor
 | AT-03 | Detail Produk | KF-12 |
 | AT-04 | Cart | KF-20, KF-21 |
 | AT-05 | Checkout | KF-22, KF-23 |
-| AT-06 | Thank You | KF-25, KF-32 |
+| AT-06 | Thank You + Panel QRIS | KF-24, KF-25, KF-32 |
 | AT-07 | Auth split-screen | KF-16, KF-17, KF-18 |
 | AT-08 | My Account | KF-19 |
 | AT-09 | 5 Halaman statis | KF-06–KF-10 |

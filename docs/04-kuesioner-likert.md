@@ -16,7 +16,7 @@
 | 4 | **S** | Setuju |
 | 5 | **SS** | Sangat Setuju |
 
-> Responden diminta memberi penilaian terhadap **22 pernyataan** yang dikelompokkan dalam **7 aspek** evaluasi.
+> Responden diminta memberi penilaian terhadap **24 pernyataan** yang dikelompokkan dalam **7 aspek** evaluasi.
 
 ---
 
@@ -89,10 +89,11 @@
 | E2 | Halaman Syarat & Ketentuan / Kebijakan Privasi membuat saya lebih percaya. | ☐ | ☐ | ☐ | ☐ | ☐ |
 | E3 | Adanya tombol bantuan WhatsApp (BUTUH BANTUAN) membuat saya merasa toko ini *responsif*. | ☐ | ☐ | ☐ | ☐ | ☐ |
 | E4 | Penjelasan "Robux dikirim manual oleh admin" membuat saya yakin sistem tidak melanggar TOS Roblox. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| E5 | Metode pembayaran QRIS (scan QR di e-wallet/m-banking) terasa familiar dan terpercaya bagi saya. | ☐ | ☐ | ☐ | ☐ | ☐ |
 
 ### Aspek F — Fitur Khas Dyaa Store
 
-> Mengukur penerimaan terhadap fitur custom yang diimplementasi (FT-01 s/d FT-12).
+> Mengukur penerimaan terhadap fitur custom yang diimplementasi (FT-01 s/d FT-13).
 
 | No | Pernyataan | 1 | 2 | 3 | 4 | 5 |
 |---|---|---|---|---|---|---|
@@ -100,6 +101,7 @@
 | F2 | Section Flash Sale dengan countdown timer membuat saya tertarik untuk segera membeli. | ☐ | ☐ | ☐ | ☐ | ☐ |
 | F3 | Notifikasi transaksi berjalan (live toast) memberikan saya rasa percaya bahwa toko ini aktif & ramai. | ☐ | ☐ | ☐ | ☐ | ☐ |
 | F4 | Halaman Login & Daftar dalam satu tampilan (split-screen + tab) terasa modern dan tidak ribet. | ☐ | ☐ | ☐ | ☐ | ☐ |
+| F5 | Panel QRIS di halaman *Thank You* (QR + instruksi 4 langkah + tombol WhatsApp) memandu saya jelas hingga pembayaran selesai. | ☐ | ☐ | ☐ | ☐ | ☐ |
 
 ### Aspek G — Kepuasan Keseluruhan
 
@@ -149,7 +151,7 @@ Persentase Aspek = (Σ skor seluruh pernyataan dalam aspek) / (Jumlah Responden 
 
 ```
 Persentase Total = (Σ semua skor) / (Jumlah Responden × Jumlah Pernyataan × 5) × 100%
-                 = Σ skor / (N × 22 × 5)
+                 = Σ skor / (N × 24 × 5)
 ```
 
 ### 5.4 Interpretasi Hasil (sesuai Sugiyono, 2013)
@@ -164,10 +166,10 @@ Persentase Total = (Σ semua skor) / (Jumlah Responden × Jumlah Pernyataan × 5
 
 ### 5.5 Contoh Perhitungan
 
-Misal **N = 20 responden**, total pernyataan = **22**, total skor terkumpul = **2.106**.
+Misal **N = 20 responden**, total pernyataan = **24**, total skor terkumpul = **2.306**.
 
 ```
-Skor Maksimum = 20 × 22 × 5             = 2.200
+Skor Maksimum = 20 × 24 × 5             = 2.400
 Persentase    = 2.106 / 2.200 × 100%    = 95,73%
 Kategori      = "Sangat Baik / Sangat Setuju"
 ```
@@ -184,10 +186,10 @@ Kategori      = "Sangat Baik / Sangat Setuju"
 | B. Kejelasan Navigasi & Informasi | 4 | _ | N × 4 × 5 | _ | _ |
 | C. Tampilan Antarmuka | 4 | _ | N × 4 × 5 | _ | _ |
 | D. Kecepatan & Responsivitas | 3 | _ | N × 3 × 5 | _ | _ |
-| E. Kepercayaan & Keamanan | 4 | _ | N × 4 × 5 | _ | _ |
-| F. Fitur Khas Dyaa Store | 4 | _ | N × 4 × 5 | _ | _ |
+| E. Kepercayaan & Keamanan | 5 | _ | N × 5 × 5 | _ | _ |
+| F. Fitur Khas Dyaa Store | 5 | _ | N × 5 × 5 | _ | _ |
 | G. Kepuasan Keseluruhan | 3 | _ | N × 3 × 5 | _ | _ |
-| **TOTAL** | **22** | _ | **N × 22 × 5** | _ | _ |
+| **TOTAL** | **24** | _ | **N × 24 × 5** | _ | _ |
 
 ### 6.2 Rekap per Pernyataan (Top-3 Tertinggi & Terendah)
 
@@ -225,10 +227,12 @@ Setiap pernyataan dipilih untuk merefleksikan satu atau lebih kebutuhan di `docs
 | E2 | T&C / Privasi memberi rasa percaya | KF-08, KF-09 |
 | E3 | Tombol WA responsif | KF-35 |
 | E4 | Penjelasan kirim manual | KF-23 (TOS-friendly) |
+| E5 | QRIS familiar & terpercaya | KF-24 |
 | F1 | Field Roblox membantu | KF-23 |
 | F2 | Flash sale menarik | KF-14 |
 | F3 | Live toast trust | KF-36 |
 | F4 | Auth split-screen modern | KF-16 |
+| F5 | Panel QRIS memandu pembayaran | KF-24, KF-25, KF-32 |
 | G1 | Puas keseluruhan | (kompositif) |
 | G2 | Akan merekomendasikan | (sentiment) |
 | G3 | Berminat beli sungguhan | (intent) |
@@ -239,7 +243,7 @@ Setiap pernyataan dipilih untuk merefleksikan satu atau lebih kebutuhan di `docs
 
 Setelah data terkumpul, BAB IV dapat menulis ringkasan dengan format berikut:
 
-> Pengujian dengan Skala Likert dilakukan terhadap **N orang responden** yang terdiri dari **X% pemain Roblox aktif** dan **Y% non-pemain**. Responden diminta menilai **22 pernyataan** yang terbagi dalam 7 aspek evaluasi: kemudahan penggunaan, kejelasan navigasi, tampilan antarmuka, kecepatan, kepercayaan & keamanan, fitur khas, dan kepuasan keseluruhan.
+> Pengujian dengan Skala Likert dilakukan terhadap **N orang responden** yang terdiri dari **X% pemain Roblox aktif** dan **Y% non-pemain**. Responden diminta menilai **24 pernyataan** yang terbagi dalam 7 aspek evaluasi: kemudahan penggunaan, kejelasan navigasi, tampilan antarmuka, kecepatan, kepercayaan & keamanan, fitur khas (termasuk pengalaman pembayaran QRIS), dan kepuasan keseluruhan.
 >
 > Hasil agregat menunjukkan persentase total **___ %** yang termasuk kategori **___**. Aspek dengan skor tertinggi adalah **___** (___ %), sedangkan aspek dengan skor terendah adalah **___** (___ %). Detail per aspek disajikan pada Tabel 6.1 di atas. Berdasarkan hasil ini, dapat disimpulkan bahwa sistem Dyaa Store dinyatakan **___** dari sisi *user experience* dan layak untuk dipakai sebagai sistem e-commerce penjualan Robux skala UMKM.
 

@@ -5,7 +5,7 @@ Description: Child theme untuk Dyaa Store — Toko E-Commerce Robux. Berbasis He
 Author: Wahyu Akbar Pratama Siregar
 Author URI: https://dyaastore.test
 Template: hello-elementor
-Version: 2.4.1
+Version: 2.5.0
 Text Domain: dyaastore-child
 */
 
@@ -4276,4 +4276,236 @@ body.dyaa-light .dyaa-theme-toggle:not(.is-light) .dyaa-theme-toggle-icon--moon 
 /* Hilangkan ::marker bullet point (li bawaan) */
 .dyaa-side-theme-row::marker { content: ""; }
 ul.dyaa-side-list .dyaa-side-theme-row { list-style: none; }
+
+/* =============================================================
+ * QRIS PAYMENT GATEWAY — Panel di Thank You Page
+ * Selaras dengan KF-24 (QRIS) & FT-13 (Gateway custom).
+ * ============================================================= */
+
+.dyaa-qris-panel {
+    margin: 32px 0;
+    padding: 28px;
+    border-radius: 22px;
+    background: linear-gradient(160deg, rgba(245, 158, 11, .12) 0%, rgba(11, 23, 64, .55) 100%);
+    border: 1px solid rgba(245, 158, 11, .25);
+    box-shadow: 0 20px 60px -20px rgba(0, 0, 0, .55);
+    color: var(--dyaa-text);
+}
+
+.dyaa-qris-head {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.dyaa-qris-brandline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(245, 158, 11, .15);
+    border: 1px solid rgba(245, 158, 11, .35);
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.dyaa-qris-tag {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: .08em;
+    font-size: .72rem;
+    padding: 3px 10px;
+    border-radius: 6px;
+}
+
+.dyaa-qris-sep {
+    opacity: .5;
+    font-size: .85rem;
+}
+
+.dyaa-qris-merchant {
+    font-weight: 700;
+    color: var(--dyaa-text);
+    letter-spacing: .01em;
+}
+
+.dyaa-qris-nmid {
+    font-size: .72rem;
+    color: var(--dyaa-text-muted);
+    font-family: ui-monospace, "Cascadia Mono", "Roboto Mono", monospace;
+}
+
+.dyaa-qris-head h2 {
+    margin: 0 0 6px;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--dyaa-text);
+}
+
+.dyaa-qris-sub {
+    margin: 0;
+    color: var(--dyaa-text-muted);
+    font-size: .95rem;
+}
+
+.dyaa-qris-sub strong {
+    color: var(--dyaa-primary);
+}
+
+.dyaa-qris-grid {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) 1.4fr;
+    gap: 28px;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .dyaa-qris-panel { padding: 20px; }
+    .dyaa-qris-grid { grid-template-columns: 1fr; gap: 20px; }
+}
+
+.dyaa-qris-imagewrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.dyaa-qris-image {
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    background: #fff;
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: 0 12px 30px -12px rgba(0, 0, 0, .35);
+    display: block;
+}
+
+.dyaa-qris-download {
+    color: var(--dyaa-primary);
+    font-weight: 600;
+    font-size: .9rem;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(245, 158, 11, .5);
+    padding-bottom: 2px;
+    transition: color .15s ease, border-color .15s ease;
+}
+
+.dyaa-qris-download:hover {
+    color: #fb923c;
+    border-color: rgba(251, 146, 60, .9);
+}
+
+.dyaa-qris-instr h3 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--dyaa-text);
+}
+
+.dyaa-qris-instr-body {
+    color: var(--dyaa-text-muted);
+    line-height: 1.7;
+    font-size: .92rem;
+}
+
+.dyaa-qris-instr-body p {
+    margin: 0 0 10px;
+}
+
+.dyaa-qris-amount {
+    list-style: none;
+    margin: 18px 0;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, .04);
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 12px;
+    display: grid;
+    gap: 10px;
+}
+
+.dyaa-qris-amount li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: .92rem;
+}
+
+.dyaa-qris-amount-label {
+    color: var(--dyaa-text-muted);
+}
+
+.dyaa-qris-amount-value {
+    color: var(--dyaa-text);
+    font-weight: 700;
+    font-family: ui-monospace, "Cascadia Mono", "Roboto Mono", monospace;
+}
+
+.dyaa-qris-amount li:first-child .dyaa-qris-amount-value {
+    color: var(--dyaa-primary);
+    font-size: 1.05rem;
+}
+
+.dyaa-qris-wa-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+    color: #fff !important;
+    text-decoration: none !important;
+    padding: 12px 22px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: .95rem;
+    box-shadow: 0 8px 20px -6px rgba(37, 211, 102, .5);
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.dyaa-qris-wa-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -6px rgba(37, 211, 102, .6);
+}
+
+.dyaa-qris-note {
+    margin: 14px 0 0;
+    padding: 10px 14px;
+    border-left: 3px solid var(--dyaa-primary);
+    background: rgba(245, 158, 11, .08);
+    color: var(--dyaa-text-muted);
+    font-size: .85rem;
+    line-height: 1.55;
+    border-radius: 0 8px 8px 0;
+}
+
+/* Light mode override — Thank You QRIS panel */
+body.dyaa-light .dyaa-qris-panel {
+    background: linear-gradient(160deg, #fff7ed 0%, #ffffff 100%);
+    border-color: rgba(245, 158, 11, .35);
+    box-shadow: 0 12px 40px -16px rgba(245, 158, 11, .25);
+}
+
+body.dyaa-light .dyaa-qris-amount {
+    background: #ffffff;
+    border-color: #f5e7c8;
+}
+
+body.dyaa-light .dyaa-qris-note {
+    background: rgba(245, 158, 11, .12);
+}
+
+/* Icon kecil di radio button checkout (WooCommerce native render) */
+.payment_methods li.payment_method_dyaa_qris img {
+    max-width: 44px;
+    max-height: 44px;
+    margin-left: 8px;
+    border-radius: 6px;
+    background: #fff;
+    padding: 3px;
+    vertical-align: middle;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+}
 

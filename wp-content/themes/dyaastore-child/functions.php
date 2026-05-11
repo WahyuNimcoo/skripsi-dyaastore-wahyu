@@ -427,6 +427,107 @@ function dyaastore_default_product_virtual( $post_id, $post, $update ) {
 add_action( 'wp_insert_post', 'dyaastore_default_product_virtual', 10, 3 );
 
 /* =============================================================
+ * KF-24 — QRIS Payment Gateway (Statis, verifikasi manual)
+ * Acuan: docs/07-implementasi-fitur.md → FT-13
+ * ============================================================= */
+
+/**
+ * Muat class gateway SEKARANG (immediate require). Child theme functions.php
+ * dijalankan SETELAH plugins_loaded, jadi WC_Payment_Gateway sudah tersedia
+ * di titik ini saat WooCommerce aktif.
+ */
+if ( class_exists( 'WC_Payment_Gateway' ) ) {
+    require_once get_stylesheet_directory() . '/inc/class-wc-dyaa-qris-gateway.php';
+}
+
+/**
+ * Daftarkan gateway ke daftar metode pembayaran WooCommerce.
+ *
+ * Filter ini akan dipanggil oleh WC saat membangun daftar gateway aktif
+ * (di admin Settings → Payments maupun di checkout).
+ *
+ * @param array $gateways
+ * @return array
+ */
+function dyaastore_register_qris_gateway( $gateways ) {
+    if ( class_exists( 'WC_Dyaa_QRIS_Gateway' ) ) {
+        $gateways[] = 'WC_Dyaa_QRIS_Gateway';
+    }
+    return $gateways;
+}
+add_filter( 'woocommerce_payment_gateways', 'dyaastore_register_qris_gateway' );
+
+/**
+ * Auto-aktifkan QRIS sekali (idempotent dengan flag
+ * 'dyaastore_qris_default_enabled') supaya admin tidak perlu toggle manual
+ * di Settings → Payments untuk demo skripsi. Admin tetap dapat menonaktifkan
+ * via UI Woo kapan saja.
+ */
+function dyaastore_qris_auto_enable_once() {
+    if ( get_option( 'dyaastore_qris_default_enabled' ) ) {
+        return;
+    }
+    if ( ! class_exists( 'WC_Dyaa_QRIS_Gateway' ) ) {
+        return;
+    }
+
+    $opts = get_option( 'woocommerce_dyaa_qris_settings', array() );
+    if ( empty( $opts['enabled'] ) ) {
+        $opts['enabled'] = 'yes';
+        update_option( 'woocommerce_dyaa_qris_settings', $opts );
+    }
+    update_option( 'dyaastore_qris_default_enabled', 1 );
+}
+add_action( 'init', 'dyaastore_qris_auto_enable_once', 5 );
+
+/**
+ * KF-15 / KF-24 — Paksa halaman Cart & Checkout ke shortcode klasik
+ * (`[woocommerce_cart]` & `[woocommerce_checkout]`).
+ *
+ * Sejak WC 9.x, halaman ini di-seed sebagai Block Checkout. Gateway
+ * pembayaran custom (termasuk QRIS Dyaa Store) belum di-port ke Block
+ * Integration API, jadi blok checkout tidak menampilkannya.
+ *
+ * Konversi ke shortcode klasik di sini bersifat idempoten (flag
+ * 'dyaastore_classic_cart_checkout') sehingga aman dijalankan setiap
+ * request: hanya jalan sekali. Admin tetap dapat mengubah konten
+ * halaman secara manual setelahnya tanpa di-overwrite.
+ */
+function dyaastore_force_classic_cart_checkout() {
+    if ( get_option( 'dyaastore_classic_cart_checkout' ) ) {
+        return;
+    }
+
+    $pages = array(
+        'woocommerce_cart_page_id'     => '[woocommerce_cart]',
+        'woocommerce_checkout_page_id' => '[woocommerce_checkout]',
+    );
+
+    foreach ( $pages as $option_name => $shortcode ) {
+        $page_id = (int) get_option( $option_name, 0 );
+        if ( ! $page_id ) {
+            continue;
+        }
+        $page = get_post( $page_id );
+        if ( ! $page || $page->post_status !== 'publish' ) {
+            continue;
+        }
+        if ( false !== strpos( $page->post_content, $shortcode ) ) {
+            continue;
+        }
+        wp_update_post(
+            array(
+                'ID'           => $page_id,
+                'post_content' => $shortcode,
+            )
+        );
+    }
+
+    update_option( 'dyaastore_classic_cart_checkout', 1 );
+}
+add_action( 'init', 'dyaastore_force_classic_cart_checkout', 6 );
+
+/* =============================================================
  * Floating WhatsApp Button + Dark Mode Toggle
  * Inspirasi: dyaastore.fusionifydigital.store
  * ============================================================= */

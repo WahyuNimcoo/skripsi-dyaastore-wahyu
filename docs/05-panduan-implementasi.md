@@ -158,9 +158,56 @@ define( 'DYAA_BRAND_TAGLINE',   'Top Up Robux Termurah & Tercepat Se-Indonesia' 
 
 Setelah disimpan, semua tombol WhatsApp (sticker mengambang, sidebar CTA, footer) otomatis pakai nomor baru.
 
-### 5.3 Aktifkan Payment Gateway Tambahan (di luar Direct Bank Transfer)
+### 5.3 Sesuaikan QRIS Payment Gateway (Bundled)
 
-Default WooCommerce hanya menyediakan **Direct Bank Transfer**, **Check payment**, dan **Cash on Delivery**. Untuk demo e-wallet/QRIS/VA seperti pada UI, install plugin gateway pihak ketiga:
+Child theme sudah membawa **custom payment gateway** `WC_Dyaa_QRIS_Gateway`
+(file `wp-content/themes/dyaastore-child/inc/class-wc-dyaa-qris-gateway.php`)
+yang **otomatis aktif** saat tema di-aktifkan pertama kali. Tidak perlu
+install plugin tambahan.
+
+**Alur kerja**:
+
+1. Customer pilih "QRIS (Scan & Bayar)" di checkout → order status
+   otomatis **On hold**.
+2. Halaman *Thank You* menampilkan **gambar QR resmi Dyaa Store** + 4
+   langkah pembayaran + tombol hijau **Kirim Bukti via WhatsApp**
+   (pesan pre-filled dengan nomor order, total, dan Username Roblox).
+3. Customer scan QR pakai e-wallet/m-banking apapun (DANA, OVO, GoPay,
+   ShopeePay, BCA mobile, dll) → bayar → kirim screenshot ke WA admin.
+4. Admin verifikasi → ubah status order ke **Processing/Completed**
+   secara manual (sama seperti alur Direct Bank Transfer).
+
+**Mengganti gambar QR (jika nama merchant berubah)**:
+
+1. Cetak ulang QR di aplikasi merchant QRIS kamu (mis. Quick QR BCA,
+   Mandiri Merchant, dll).
+2. Replace file: `wp-content/themes/dyaastore-child/assets/img/dyaa-qris.png`
+3. Atau ubah lewat **WooCommerce → Settings → Payments → QRIS — Scan &
+   Bayar → Manage → URL gambar QRIS** (boleh isi URL eksternal).
+
+**Mengubah merchant info dan nomor WhatsApp konfirmasi**:
+
+Buka **WooCommerce → Settings → Payments → QRIS — Scan & Bayar → Manage**:
+
+
+| Field             | Default                                 | Catatan                                        |
+| ----------------- | --------------------------------------- | ---------------------------------------------- |
+| Judul di Checkout | "QRIS (Scan & Bayar)"                   | Label radio button di payment methods          |
+| Description       | Penjelasan singkat e-wallet & m-banking | Tampil di bawah label saat dipilih             |
+| Instructions      | 4 langkah pembayaran                    | Render di thank-you page + email customer      |
+| Merchant Name     | `dya store`                             | Ditampilkan di brand-line atas panel QR        |
+| NMID              | `ID1026477730984`                       | National Merchant ID, dari QR fisik            |
+| Nomor WhatsApp    | `${DYAA_WHATSAPP_NUMBER}`               | Format internasional tanpa `+` (mis 62895xxxx) |
+| Order Status      | **On hold** (rekomendasi)               | Stok dikunci sampai admin verifikasi           |
+
+> Gateway dibuat **idempoten**: opsi `dyaastore_qris_default_enabled`
+> menjamin admin yang sengaja menonaktifkan QRIS tidak akan ter-overwrite
+> ke `enabled=yes` setiap reload.
+
+### 5.4 (Opsional) Plugin Payment Gateway Tambahan
+
+Selain QRIS bundled di atas, admin dapat menambah plugin gateway pihak
+ketiga jika ingin payment otomatis tanpa verifikasi manual:
 
 
 | Plugin                   | Sumber                          | Catatan                        |
@@ -170,9 +217,11 @@ Default WooCommerce hanya menyediakan **Direct Bank Transfer**, **Check payment*
 | Midtrans for WooCommerce | midtrans.com                    | Sandbox + production           |
 
 
-> **Untuk skripsi**, mode **sandbox** sudah cukup sebagai bukti integrasi (tidak perlu transaksi real). Plugin ini **di luar inti skripsi** dan **opsional** sesuai batasan BAB I §1.4.
+> Plugin pihak ketiga ini **di luar inti skripsi** dan **opsional** sesuai
+> batasan BAB I §1.4. QRIS bundled sudah cukup untuk seluruh skenario
+> pembayaran yang diuji di BAB IV §4.2.
 
-### 5.4 Re-trigger Seeders Manual (jika dibutuhkan)
+### 5.5 Re-trigger Seeders Manual (jika dibutuhkan)
 
 Jika kategori / produk / halaman statis terhapus dan ingin di-buat ulang:
 

@@ -36,6 +36,7 @@
 | FT-10 | Sidebar Custom 3-Grup + WhatsApp CTA | `functions.php` | KF-02, KF-35 |
 | FT-11 | Floating WhatsApp Sticker | `functions.php` | KF-35 |
 | FT-12 | Pre-Paint Script Anti-Flash Light Mode | `functions.php` | KF-05, KNF-07 |
+| FT-13 | QRIS Payment Gateway + Auto-Convert Cart/Checkout Klasik | `inc/class-wc-dyaa-qris-gateway.php`, `functions.php` | KF-24 |
 
 ---
 
@@ -674,6 +675,146 @@ html.dyaa-light-pre {
 
 ---
 
+## FT-13 — QRIS Payment Gateway (Statis, Verifikasi Manual)
+
+**Lokasi**: `wp-content/themes/dyaastore-child/inc/class-wc-dyaa-qris-gateway.php` (full class, ±290 baris) · registrasi & auto-config di `functions.php` (baris 425–520)
+**KF**: KF-24 (Metode pembayaran QRIS aktif dengan verifikasi manual)
+**Antarmuka**: AT-05 (Payment Methods), AT-06b (Panel QRIS Thank You), AT-06c (Email Konfirmasi)
+
+### Mengapa Pendekatan QRIS Statis?
+
+Sesuai batasan BAB I §1.4 ("tidak melakukan integrasi API payment
+gateway pihak ketiga"), Dyaa Store memakai **QRIS statis** — gambar QR
+resmi merchant ("dya store", NMID `ID1026477730984`) ditampilkan di
+halaman *Thank You*. Customer scan → bayar di e-wallet/m-banking apapun →
+kirim bukti via WhatsApp → admin verifikasi manual. Alur ini konsisten
+dengan model **pengiriman Robux manual** yang sudah dipakai untuk
+produk virtual.
+
+### Alur Kerja Lengkap
+
+1. **Customer**: pilih "QRIS (Scan & Bayar)" di checkout → klik Place order.
+2. **`process_payment()`**: ubah status order → `on-hold`, kurangi stok, kosongkan cart, redirect ke `/checkout/order-received/{id}/`.
+3. **`thankyou_page()`**: render panel QRIS (brand-line, QR image, instruksi 4 langkah, tombol WhatsApp pre-filled).
+4. **`email_instructions()`**: tempel blok HTML/plain-text QRIS di email konfirmasi customer.
+5. **Customer**: scan QR → bayar di aplikasi favorit → screenshot bukti → klik tombol WhatsApp (deeplink dengan pesan otomatis berisi #order, total, Username Roblox) → kirim ke admin.
+6. **Admin**: verifikasi rekening → ubah status order ke *Processing* / *Completed* → kirim Robux manual ke akun Roblox customer.
+
+### Class Skeleton
+
+```php
+class WC_Dyaa_QRIS_Gateway extends WC_Payment_Gateway {
+    public function __construct() {
+        $this->id                 = 'dyaa_qris';
+        $this->icon               = get_stylesheet_directory_uri() . '/assets/img/dyaa-qris.png';
+        $this->method_title       = __( 'QRIS — Scan & Bayar', 'dyaastore-child' );
+        $this->method_description = __( 'Pembayaran via QRIS statis...', 'dyaastore-child' );
+        $this->init_form_fields();
+        $this->init_settings();
+        $this->title         = $this->get_option( 'title' );
+        $this->merchant_name = $this->get_option( 'merchant_name' );
+        $this->merchant_nmid = $this->get_option( 'merchant_nmid' );
+        $this->qr_image_url  = $this->get_option( 'qr_image_url' );
+        $this->wa_number     = $this->get_option( 'wa_number' );
+        $this->order_status  = $this->get_option( 'order_status', 'on-hold' );
+        add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+        add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ), 5 );
+        add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
+    }
+    public function init_form_fields() { /* 8 setting fields */ }
+    public function process_payment( $order_id ) { /* set on-hold, reduce stock, empty cart */ }
+    public function thankyou_page( $order_id ) { /* render panel QR */ }
+    public function email_instructions( $order, $sent_to_admin, $plain_text ) { /* HTML/text */ }
+    protected function build_wa_url( $order ) { /* wa.me/{number}?text=pesan terstruktur */ }
+}
+```
+
+### Registrasi (functions.php)
+
+```php
+// 1) Immediate require — child theme functions.php dijalankan SETELAH
+// plugins_loaded, jadi WC_Payment_Gateway pasti sudah ada di sini.
+if ( class_exists( 'WC_Payment_Gateway' ) ) {
+    require_once get_stylesheet_directory() . '/inc/class-wc-dyaa-qris-gateway.php';
+}
+
+// 2) Daftarkan ke daftar gateway WooCommerce.
+add_filter( 'woocommerce_payment_gateways', function( $gateways ) {
+    if ( class_exists( 'WC_Dyaa_QRIS_Gateway' ) ) {
+        $gateways[] = 'WC_Dyaa_QRIS_Gateway';
+    }
+    return $gateways;
+} );
+
+// 3) Auto-aktifkan sekali (idempotent dengan flag option).
+add_action( 'init', function() {
+    if ( get_option( 'dyaastore_qris_default_enabled' ) ) return;
+    if ( ! class_exists( 'WC_Dyaa_QRIS_Gateway' ) ) return;
+    $opts = get_option( 'woocommerce_dyaa_qris_settings', array() );
+    if ( empty( $opts['enabled'] ) ) {
+        $opts['enabled'] = 'yes';
+        update_option( 'woocommerce_dyaa_qris_settings', $opts );
+    }
+    update_option( 'dyaastore_qris_default_enabled', 1 );
+}, 5 );
+
+// 4) Paksa halaman Cart & Checkout pakai classic shortcode
+// (Block Checkout WC 9.x+ belum kompatibel dengan custom gateway legacy).
+add_action( 'init', function() {
+    if ( get_option( 'dyaastore_classic_cart_checkout' ) ) return;
+    $pages = array(
+        'woocommerce_cart_page_id'     => '[woocommerce_cart]',
+        'woocommerce_checkout_page_id' => '[woocommerce_checkout]',
+    );
+    foreach ( $pages as $option => $shortcode ) {
+        $pid = (int) get_option( $option );
+        if ( $pid ) {
+            wp_update_post( array( 'ID' => $pid, 'post_content' => $shortcode ) );
+        }
+    }
+    update_option( 'dyaastore_classic_cart_checkout', 1 );
+}, 6 );
+```
+
+### Pesan WhatsApp Otomatis (build_wa_url)
+
+```text
+Halo admin Dyaa Store, saya mau konfirmasi pembayaran QRIS:
+
+• Nomor Pesanan : #{order_number}
+• Total         : {currency_total}
+• Username Roblox: {customer_roblox_username}
+
+Bukti pembayaran terlampir.
+```
+
+URL: `https://wa.me/{WA_NUMBER}?text={url_encoded_message}`. Admin melihat
+data lengkap pada pertama kali customer kontak — tidak perlu tanya
+ulang.
+
+### Settings Page (WooCommerce → Payments → QRIS)
+
+| Field             | Tipe     | Default                                |
+| ----------------- | -------- | -------------------------------------- |
+| enabled           | checkbox | yes (auto)                             |
+| title             | text     | QRIS (Scan & Bayar)                    |
+| description       | textarea | Penjelasan e-wallet/m-banking          |
+| instructions      | textarea | 4 langkah pembayaran                   |
+| merchant_name     | text     | dya store                              |
+| merchant_nmid     | text     | ID1026477730984                        |
+| qr_image_url      | text     | `{stylesheet_uri}/assets/img/dyaa-qris.png` |
+| wa_number         | text     | `${DYAA_WHATSAPP_NUMBER}`              |
+| order_status      | select   | on-hold (rekomendasi) / pending        |
+
+### Catatan Implementasi Penting
+
+- **Idempoten**: kedua action `init` punya flag option sehingga aman di-load berulang. Admin yang sengaja menonaktifkan QRIS tidak akan ter-overwrite.
+- **Block Checkout WC 9.x+**: gateway custom legacy tidak otomatis muncul di Block Checkout. Maka di build ini, halaman Cart & Checkout dikonversi ke classic shortcode satu kali. Pendekatan ini dipilih daripada implementasi Block Integration API (memerlukan JS bundle terpisah) karena lebih hemat dependency untuk skripsi.
+- **Stock-Locking**: dengan `order_status=on-hold`, stok produk **otomatis dikurangi** ketika order dibuat → terhindar dari over-selling sebelum verifikasi.
+- **Tema gelap & terang**: panel QR menggunakan CSS variable `--dyaa-text`, `--dyaa-primary`, `--dyaa-text-muted` dengan override khusus di `body.dyaa-light`. Hasil verifikasi via browser-use: kontras baik di kedua mode.
+
+---
+
 ## Daftar Hook WordPress yang Dipakai (Rekap)
 
 Untuk menjelaskan di BAB IV bahwa implementasi mengikuti **best practice WordPress** (semua perilaku custom diintegrasikan lewat hook, bukan modifikasi core), berikut hook yang digunakan:
@@ -705,6 +846,11 @@ Untuk menjelaskan di BAB IV bahwa implementasi mengikuti **best practice WordPre
 | `wp_dashboard_setup` | action | Tambah dashboard widget |
 | `admin_init` (prio 25 & 30) | action | Trigger pages seeder & products seeder |
 | `admin_notices` | action | Tampilkan notice setelah seeder jalan |
+| `woocommerce_payment_gateways` | filter | Daftarkan `WC_Dyaa_QRIS_Gateway` ke daftar metode pembayaran Woo (FT-13) |
+| `woocommerce_thankyou_dyaa_qris` | action | Render panel QR + instruksi di halaman thank-you (FT-13) |
+| `woocommerce_email_before_order_table` | action | Tempel instruksi QRIS + gambar QR ke email customer (FT-13) |
+| `woocommerce_update_options_payment_gateways_dyaa_qris` | action | Simpan settings QRIS dari admin form (FT-13) |
+| `init` (prio 5 & 6) | action | Auto-enable QRIS (sekali) + konversi Cart/Checkout ke classic shortcode (FT-13) |
 
 ---
 
@@ -712,8 +858,8 @@ Untuk menjelaskan di BAB IV bahwa implementasi mengikuti **best practice WordPre
 
 > Bagian §4.1.3 skripsi dapat menulis ringkas:
 
-> Implementasi fitur custom Dyaa Store dilakukan dengan strategi **modular** dan **non-invasif** terhadap core WordPress. Sebanyak 12 fitur utama (FT-01 hingga FT-12) ditulis menggunakan **hook system** WordPress (action & filter) sehingga ketika WordPress / WooCommerce / Elementor melakukan pembaruan, kode kustom tidak terdampak. Seluruh kode berkonvensi prefix `dyaastore_` (function), `.dyaa-` (CSS class), dan `[dyaa_]` (shortcode) untuk menghindari kolisi dengan plugin pihak ketiga.
+> Implementasi fitur custom Dyaa Store dilakukan dengan strategi **modular** dan **non-invasif** terhadap core WordPress. Sebanyak 13 fitur utama (FT-01 hingga FT-13) ditulis menggunakan **hook system** WordPress (action & filter) sehingga ketika WordPress / WooCommerce / Elementor melakukan pembaruan, kode kustom tidak terdampak. Seluruh kode berkonvensi prefix `dyaastore_` (function), `.dyaa-` (CSS class), dan `[dyaa_]` (shortcode) untuk menghindari kolisi dengan plugin pihak ketiga.
 
-> Dua *must-use plugin* (`dyaastore-pages.php`, `dyaastore-seeder.php`) memastikan instalasi sistem **dapat direplikasi** karena 5 halaman statis dan 8 produk Robux demo dibuat secara otomatis tanpa intervensi manual. Untuk integrasi WooCommerce versi terbaru, kolom kustom "Username Roblox" pada listing pesanan didaftarkan ganda — pada filter legacy (`manage_edit-shop_order_columns`) dan filter HPOS (`manage_woocommerce_page_wc-orders_columns`) — sehingga sistem berfungsi pada kedua mode storage WooCommerce.
+> Dua *must-use plugin* (`dyaastore-pages.php`, `dyaastore-seeder.php`) memastikan instalasi sistem **dapat direplikasi** karena 5 halaman statis dan 8 produk Robux demo dibuat secara otomatis tanpa intervensi manual. Untuk integrasi WooCommerce versi terbaru, kolom kustom "Username Roblox" pada listing pesanan didaftarkan ganda — pada filter legacy (`manage_edit-shop_order_columns`) dan filter HPOS (`manage_woocommerce_page_wc-orders_columns`) — sehingga sistem berfungsi pada kedua mode storage WooCommerce. Khusus pembayaran QRIS (FT-13), pendekatan **statis dengan verifikasi manual** dipilih sesuai batasan BAB I §1.4 (tanpa integrasi API gateway pihak ketiga) dan disertai konversi halaman Cart/Checkout ke shortcode klasik agar gateway custom tampil pada Block Checkout WooCommerce ≥9.x.
 
 > Detail bukti kebenaran setiap fitur (apakah memang berjalan sesuai kebutuhan KF) dilakukan pada pengujian Black Box di `docs/03-pengujian-blackbox.md`.

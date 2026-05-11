@@ -128,6 +128,37 @@
 
 ---
 
+## F2. Pengujian Pembayaran QRIS (KF-24 — FT-13)
+
+> Sub-section dedikasi untuk gateway custom **WC_Dyaa_QRIS_Gateway** (FT-13).
+> Pre-condition: child theme aktif, opsi `dyaastore_qris_default_enabled = 1`
+> (auto), halaman Cart & Checkout sudah classic shortcode.
+
+| TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
+|---|---|---|---|---|---|---|---|
+| TC-F2.1 | KF-24 | AT-15 | QRIS gateway terdaftar di admin | Login `dyaa_admin` → WooCommerce → Settings → Payments | Baris "QRIS — Scan & Bayar" muncul dengan toggle berwarna hijau **Active** | _isi_ | _ |
+| TC-F2.2 | KF-24 | AT-15 | Settings page QRIS lengkap | Klik "Manage" pada baris QRIS | 8 field tampil: enabled, title, description, instructions, merchant_name, merchant_nmid, qr_image_url, wa_number, order_status | _isi_ | _ |
+| TC-F2.3 | KF-24 | AT-05 | QRIS muncul di payment methods checkout | Cart isi → buka /checkout/ (logout) | Radio "QRIS (Scan & Bayar)" muncul sebagai opsi pertama dengan thumbnail QR 44px di sebelah label | _isi_ | _ |
+| TC-F2.4 | KF-24 | AT-05 | QRIS terpilih default | Buka /checkout/ → scroll ke Payment | Radio QRIS sudah `checked` secara default; deskripsi langsung tampil | _isi_ | _ |
+| TC-F2.5 | KF-24 | AT-05 | Description tampil saat radio diklik | Klik radio QRIS | Deskripsi: "Bayar dengan scan QRIS pakai aplikasi e-wallet (DANA, OVO, GoPay, ShopeePay)..." | _isi_ | _ |
+| TC-F2.6 | KF-24 | AT-06b | Place order QRIS → status on-hold | Billing valid + QRIS + klik Place order | Order status di admin: **On hold**; stok produk berkurang | _isi_ | _ |
+| TC-F2.7 | KF-24 | AT-06b | Thank You menampilkan brand-line | Lanjut dari TC-F2.6 | Brand-line "QRIS · dya store · NMID ID1026477730984" tampil di kepala panel | _isi_ | _ |
+| TC-F2.8 | KF-24 | AT-06b | Thank You menampilkan gambar QR | Lanjut dari TC-F2.6 | Gambar QR resmi muncul di kolom kiri (white bg, rounded, max-width 320px) | _isi_ | _ |
+| TC-F2.9 | KF-24 | AT-06b | Sub-judul menyertakan #order & total | Lanjut dari TC-F2.6 | Teks "Pesanan #{N} menunggu pembayaran sebesar Rp{X}" tampil persis | _isi_ | _ |
+| TC-F2.10 | KF-24 | AT-06b | Instruksi 4 langkah pembayaran tampil | Lanjut dari TC-F2.6 | Paragraf "1. Buka aplikasi... 2. Scan... 3. Konfirmasi... 4. Kirim bukti..." tampil utuh | _isi_ | _ |
+| TC-F2.11 | KF-24 | AT-06b | Box nominal akurat | Lanjut dari TC-F2.6 | Card menampilkan "Nominal: Rp{total}" dan "Nomor Pesanan: #{N}" dengan font monospace | _isi_ | _ |
+| TC-F2.12 | KF-24 | AT-06b | Tombol WhatsApp deeplink valid | Hover tombol → copy link | URL: `https://wa.me/{WA_NUMBER}?text=...` (encoded); query `text` berisi #order, total, Roblox username | _isi_ | _ |
+| TC-F2.13 | KF-24 | AT-06b | Link "Unduh gambar QR" berfungsi | Klik link di bawah QR | Browser men-download file `qris-dyaa-store-{N}.png` | _isi_ | _ |
+| TC-F2.14 | KF-24 | AT-06b | Panel QRIS di mode terang | Lanjut TC-F2.6, klik theme toggle | Background panel berubah krem/putih, teks tetap kontras, tombol WA tetap hijau | _isi_ | _ |
+| TC-F2.15 | KF-24 | AT-06b | Panel QRIS responsif <768px | Buka thank-you di viewport 375×667 | Layout 1 kolom: QR di atas, instruksi di bawah; padding panel 20px | _isi_ | _ |
+| TC-F2.16 | KF-24 | AT-06c | Email konfirmasi QRIS terkirim | Lanjut TC-F2.6 → buka email customer | Email berisi blok HTML krem dengan: judul, gambar QR (max-width 280px), tombol WA hijau, instruksi 4 langkah | _isi_ | _ |
+| TC-F2.17 | KF-24 | AT-15 | Admin dapat ubah Merchant Name | Settings → QRIS → ubah merchant_name → Save | Brand-line di thank-you page berubah sesuai input baru | _isi_ | _ |
+| TC-F2.18 | KF-24 | AT-15 | Admin dapat menonaktifkan QRIS | Uncheck enabled → Save | Reload /checkout/ → QRIS hilang dari payment methods | _isi_ | _ |
+| TC-F2.19 | KF-24 | — | Idempotensi auto-enable | Setelah admin nonaktifkan, reload site | QRIS **tetap nonaktif** (flag `dyaastore_qris_default_enabled=1` mencegah overwrite) | _isi_ | _ |
+| TC-F2.20 | KF-24 | AT-05 | Halaman Cart dipaksa classic | Buka /cart/ | Form keranjang klasik tampil (bukan Block Cart); tombol "Proceed to checkout" terlihat | _isi_ | _ |
+
+---
+
 ## G. Pengujian Manajemen Pesanan oleh Admin (KF-26 s/d KF-31)
 
 | TC | KF | AT | Skenario | Input | Expected Output | Hasil Aktual | Status |
@@ -185,10 +216,11 @@
 | D. Autentikasi | 9 | _ | _ | _ |
 | E. Keranjang | 6 | _ | _ | _ |
 | F. Checkout & Field Roblox | 11 | _ | _ | _ |
+| F2. Pembayaran QRIS (FT-13) | 20 | _ | _ | _ |
 | G. Manajemen Pesanan Admin | 12 | _ | _ | _ |
 | H. Notifikasi Email | 3 | _ | _ | _ |
 | I. Antarmuka & Fitur Khas | 9 | _ | _ | _ |
-| **TOTAL** | **77** | _ | _ | _ |
+| **TOTAL** | **97** | _ | _ | _ |
 
 ### Rumus Persentase
 ```
@@ -206,7 +238,7 @@
 ### Kesimpulan
 > _Diisi setelah eksekusi_, contoh format:
 >
-> "Berdasarkan hasil pengujian Black Box dengan total 77 *test case* yang dieksekusi pada lingkungan Laragon + WordPress 6.9 + WooCommerce 9.x + child theme `dyaastore-child`, diperoleh tingkat keberhasilan sebesar **___ %** (Pass: ___, Fail: ___). Dengan demikian sistem Dyaa Store dinyatakan **___** sesuai kriteria kelulusan BAB III §3.2.4. Test case yang gagal serta upaya perbaikannya dijelaskan pada Lampiran B."
+> "Berdasarkan hasil pengujian Black Box dengan total 97 *test case* yang dieksekusi pada lingkungan Laragon + WordPress 6.9 + WooCommerce 10.7 + child theme `dyaastore-child`, diperoleh tingkat keberhasilan sebesar **___ %** (Pass: ___, Fail: ___). Sub-kategori F2 (20 TC) khusus memverifikasi gateway pembayaran QRIS (FT-13) yang dibangun sebagai *custom WooCommerce payment gateway* dengan model verifikasi manual via WhatsApp — sesuai batasan BAB I §1.4 yang tidak melibatkan integrasi API payment gateway pihak ketiga. Dengan demikian sistem Dyaa Store dinyatakan **___** sesuai kriteria kelulusan BAB III §3.2.4. Test case yang gagal serta upaya perbaikannya dijelaskan pada Lampiran B."
 
 ---
 
