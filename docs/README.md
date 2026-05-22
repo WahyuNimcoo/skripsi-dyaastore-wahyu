@@ -115,7 +115,7 @@ docs/
 | Black Box: 100 TC sudah dieksekusi & diisi Pass/Fail | ⏳ saat pengujian |
 | Likert: minimal 20 responden mengisi (24 pernyataan) | ⏳ saat sebar kuesioner |
 | Ringkasan eksekutif untuk slide presentasi | ⏳ |
-| Repository GitHub (kode + docs) sudah final & dapat di-clone | ✅ ([dyaastore](https://github.com/WahyuNimcoo/dyaastore)) |
+| Repository GitHub (kode + docs) sudah final & dapat di-clone | ✅ ([skripsi-dyaastore-wahyu](https://github.com/WahyuNimcoo/skripsi-dyaastore-wahyu)) |
 
 ---
 
